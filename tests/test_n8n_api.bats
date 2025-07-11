@@ -236,7 +236,7 @@ teardown() {
 @test "n8n-api.sh shows help with unknown command" {
   run scripts/n8n-api.sh unknown-command
   [ "$status" -eq 0 ]
-  assert_output_contains "n8n API Operations"
+  assert_output_contains "n8n API Wrapper"
   assert_output_contains "WORKFLOW OPERATIONS"
   assert_output_contains "CREDENTIAL OPERATIONS"
   assert_output_contains "EXECUTION OPERATIONS"

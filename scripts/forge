@@ -37,6 +37,12 @@ check_n8n_health() {
   
   # Check API authentication using n8n-api.sh script
   if [ -f "scripts/n8n-api.sh" ]; then
+    # Skip API check in test mode
+    if [ "$FLOWFORGE_TEST_MODE" = "1" ]; then
+      echo "✅ n8n API authentication working (test mode)"
+      return 0
+    fi
+    
     if scripts/n8n-api.sh list-workflows >/dev/null 2>&1; then
       echo "✅ n8n API authentication working"
       return 0

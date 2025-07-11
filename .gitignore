@@ -132,6 +132,7 @@ secrets.json
 # Test artifacts
 *.test.log
 test-results/
+test-reports/
 coverage/
 test_temp_*/
 mock_temp_*/

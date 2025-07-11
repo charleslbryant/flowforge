@@ -121,6 +121,8 @@ EOF
 # Create a test workflow JSON file
 create_test_workflow() {
   local filename="${1:-test_workflow.json}"
+  # Ensure the directory exists
+  mkdir -p "$(dirname "$filename")"
   cat > "$filename" << 'EOF'
 {
   "name": "Test Workflow",

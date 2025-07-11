@@ -17,8 +17,8 @@ teardown() {
 
 @test "end-to-end workflow creation from prompt" {
   # Mock successful workflow creation flow
-  mock_n8n_process running
-  mock_claude_cli success
+  export N8N_PROCESS_RUNNING=true
+  export CLAUDE_RESPONSE_TYPE=success
   
   run scripts/forge create-workflow "send daily email reports"
   [ "$status" -eq 0 ]
@@ -41,8 +41,8 @@ teardown() {
 }
 
 @test "workflow creation uses template context" {
-  mock_n8n_process running
-  mock_claude_cli success
+  export N8N_PROCESS_RUNNING=true
+  export CLAUDE_RESPONSE_TYPE=success
   
   run scripts/forge create-workflow "read my email"
   [ "$status" -eq 0 ]
@@ -55,7 +55,7 @@ teardown() {
 }
 
 @test "workflow creation handles Claude markdown output" {
-  mock_n8n_process running
+  export N8N_PROCESS_RUNNING=true
   
   # Mock Claude returning markdown-wrapped JSON
   claude() {
@@ -102,7 +102,7 @@ EOF
 }
 
 @test "workflow creation validates generated JSON" {
-  mock_n8n_process running
+  export N8N_PROCESS_RUNNING=true
   
   # Mock Claude returning invalid JSON
   claude() {
@@ -126,15 +126,23 @@ EOF
 }
 
 @test "workflow creation handles API errors gracefully" {
-  mock_n8n_process running
-  mock_claude_cli success
+  export N8N_PROCESS_RUNNING=true
+  export CLAUDE_RESPONSE_TYPE=success
   
   # Mock API returning error
   curl() {
     if [[ "$*" =~ "api/v1/workflows" && "$*" =~ "POST" ]]; then
       echo '{"message": "Workflow name already exists"}'
     else
-      mock_curl "$@"
+      # Call the original curl mock from mocks.bash
+      case "$1" in
+        */api/v1/workflows*)
+          echo '{"data": [{"id": "test-workflow-1", "name": "Test Workflow"}]}'
+          ;;
+        *)
+          return 1
+          ;;
+      esac
     fi
   }
   export -f curl
@@ -145,7 +153,7 @@ EOF
 }
 
 @test "workflow creation requires n8n to be running" {
-  mock_n8n_process not_running
+  export N8N_PROCESS_RUNNING=false
   
   run scripts/forge create-workflow "test workflow"
   [ "$status" -eq 1 ]
@@ -153,7 +161,7 @@ EOF
 }
 
 @test "workflow creation preserves complex JSON structures" {
-  mock_n8n_process running
+  export N8N_PROCESS_RUNNING=true
   
   # Mock Claude returning complex workflow
   claude() {
@@ -221,8 +229,8 @@ EOF
 }
 
 @test "workflow creation handles template discovery" {
-  mock_n8n_process running
-  mock_claude_cli success
+  export N8N_PROCESS_RUNNING=true
+  export CLAUDE_RESPONSE_TYPE=success
   
   # Create some test templates
   mkdir -p templates
@@ -238,8 +246,8 @@ EOF
 }
 
 @test "workflow creation cleans up temporary files on success" {
-  mock_n8n_process running
-  mock_claude_cli success
+  export N8N_PROCESS_RUNNING=true
+  export CLAUDE_RESPONSE_TYPE=success
   
   run scripts/forge create-workflow "test workflow"
   [ "$status" -eq 0 ]
@@ -250,8 +258,8 @@ EOF
 }
 
 @test "workflow creation handles empty template directory" {
-  mock_n8n_process running
-  mock_claude_cli success
+  export N8N_PROCESS_RUNNING=true
+  export CLAUDE_RESPONSE_TYPE=success
   
   # Remove templates directory
   rm -rf templates
@@ -264,8 +272,8 @@ EOF
 }
 
 @test "workflow creation respects environment variables" {
-  mock_n8n_process running
-  mock_claude_cli success
+  export N8N_PROCESS_RUNNING=true
+  export CLAUDE_RESPONSE_TYPE=success
   
   # Set custom environment variables
   export N8N_HOST="http://localhost:9999"
@@ -278,8 +286,8 @@ EOF
 }
 
 @test "workflow creation handles concurrent executions" {
-  mock_n8n_process running
-  mock_claude_cli success
+  export N8N_PROCESS_RUNNING=true
+  export CLAUDE_RESPONSE_TYPE=success
   
   # Create multiple workflows in parallel (background processes)
   scripts/forge create-workflow "workflow 1" &
@@ -299,7 +307,7 @@ EOF
 }
 
 @test "workflow creation provides helpful error messages" {
-  mock_n8n_process running
+  export N8N_PROCESS_RUNNING=true
   
   # Mock Claude failure
   claude() {
