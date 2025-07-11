@@ -1,0 +1,24 @@
+name: Validate Claude Workflow
+
+on:
+  push:
+    paths:
+      - 'workflow.json'
+  pull_request:
+    paths:
+      - 'workflow.json'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Install ajv-cli
+        run: npm install -g ajv-cli
+
+      - name: Validate workflow.json against n8n schema
+        run: |
+          curl -s -o n8n-schema.json https://json.schemastore.org/n8n-workflow
+          ajv validate -s n8n-schema.json -d workflow.json

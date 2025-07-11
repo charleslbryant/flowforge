@@ -1,0 +1,9 @@
+Generate a clean n8n workflow JSON for: send me daily weather updates
+
+Requirements:
+- Use n8n platform
+- Include appropriate nodes for the task
+- Use proper node connections
+- Output ONLY valid JSON, no markdown, no explanations, no code blocks
+
+Generate the complete n8n workflow JSON object.

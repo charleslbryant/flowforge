@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "✨ Pre-commit: formatting workflow.json with jq..."
+if ! command -v jq &> /dev/null; then
+  echo "jq is not installed. Skipping auto-format."
+  exit 0
+fi
+
+jq . workflow.json > tmp.json && mv tmp.json workflow.json
+git add workflow.json

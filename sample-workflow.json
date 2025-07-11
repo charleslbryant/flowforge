@@ -1,0 +1,40 @@
+{
+  "name": "FlowForge Test Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "start-node",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "url": "https://api.openweathermap.org/data/2.5/weather?q=Jacksonville,FL&appid=demo"
+      },
+      "id": "http-node",
+      "name": "Get Weather",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [460, 300]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Get Weather",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

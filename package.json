@@ -1,0 +1,11 @@
+{
+  "name": "flowforge",
+  "version": "0.1.0",
+  "description": "AI-powered workflow builder for n8n using Claude Code + API shell script",
+  "bin": {
+    "forge": "./scripts/forge"
+  },
+  "keywords": ["n8n", "claude", "automation", "shell-script"],
+  "author": "Charles Bryant",
+  "license": "MIT"
+}

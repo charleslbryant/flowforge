@@ -1,0 +1,109 @@
+{
+  "createdAt": "2025-07-11T18:26:17.472Z",
+  "updatedAt": "2025-07-11T18:26:17.472Z",
+  "id": "D4OLtxQT60FVkTE8",
+  "name": "FlowForge Test Workflow",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "start-node",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "url": "https://api.openweathermap.org/data/2.5/weather?q=Jacksonville,FL&appid=demo"
+      },
+      "id": "http-node",
+      "name": "Get Weather",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Get Weather",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "ce4cd8f6-f005-49ed-a299-4370ced42858",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "createdAt": "2025-07-11T18:26:17.478Z",
+      "updatedAt": "2025-07-11T18:26:17.478Z",
+      "role": "workflow:owner",
+      "workflowId": "D4OLtxQT60FVkTE8",
+      "projectId": "w1L0XgHuxNFXXkuh",
+      "project": {
+        "createdAt": "2025-07-11T12:51:29.665Z",
+        "updatedAt": "2025-07-11T12:58:40.261Z",
+        "id": "w1L0XgHuxNFXXkuh",
+        "name": "Example User <user@example.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "projectRelations": [
+          {
+            "createdAt": "2025-07-11T12:51:29.665Z",
+            "updatedAt": "2025-07-11T12:51:29.665Z",
+            "role": "project:personalOwner",
+            "userId": "a349042f-ed67-40cd-b5ae-c8a07464f012",
+            "projectId": "w1L0XgHuxNFXXkuh",
+            "user": {
+              "createdAt": "2025-07-11T12:51:29.337Z",
+              "updatedAt": "2025-07-11T17:41:05.000Z",
+              "id": "a349042f-ed67-40cd-b5ae-c8a07464f012",
+              "email": "user@example.com",
+              "firstName": "Example",
+              "lastName": "User",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2025-07-11T12:59:00.468Z",
+                "personalization_survey_n8n_version": "1.101.2",
+                "companySize": "<20",
+                "companyType": "saas",
+                "role": "business-owner",
+                "reportedSource": "youtube"
+              },
+              "settings": {
+                "userActivated": false
+              },
+              "role": "global:owner",
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2025-07-11",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": []
+}

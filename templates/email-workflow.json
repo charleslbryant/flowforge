@@ -1,0 +1,88 @@
+{
+  "name": "Email Workflow Template",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "value": "0 */30 * * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "protocol": "imap",
+        "host": "imap.gmail.com",
+        "port": 993,
+        "secure": true,
+        "email": "your-email@gmail.com",
+        "password": "your-app-password",
+        "format": "simple",
+        "readOnlyMode": false,
+        "downloadAttachments": false
+      },
+      "id": "email-imap",
+      "name": "Read Email",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.flags?.includes('\\\\Seen') }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            }
+          ]
+        }
+      },
+      "id": "filter-unread",
+      "name": "Filter Unread",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [680, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Email": {
+      "main": [
+        [
+          {
+            "node": "Filter Unread",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

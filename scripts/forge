@@ -1,0 +1,285 @@
+#!/bin/bash
+
+COMMAND=$1
+N8N_PORT=5678
+N8N_HOST="http://localhost:$N8N_PORT"
+
+run_install() {
+  bash scripts/install.sh
+}
+
+check_n8n_health() {
+  echo "🏥 Checking n8n health..."
+  
+  # Check if n8n process is running
+  if ! pgrep -f "n8n" > /dev/null; then
+    echo "❌ n8n process not found"
+    echo "   Run: nohup n8n > ~/n8n.log 2>&1 &"
+    return 1
+  fi
+  echo "✅ n8n process running"
+  
+  # Check if port is accessible
+  if ! nc -z localhost $N8N_PORT 2>/dev/null; then
+    echo "❌ n8n not responding on port $N8N_PORT"
+    echo "   Check ~/n8n.log for errors"
+    return 1
+  fi
+  echo "✅ n8n port $N8N_PORT accessible"
+  
+  # Check if web interface responds
+  if ! curl -s -f "$N8N_HOST/healthz" >/dev/null; then
+    echo "❌ n8n web interface not responding"
+    echo "   Try: curl -I $N8N_HOST"
+    return 1
+  fi
+  echo "✅ n8n web interface responding"
+  
+  # Check API authentication using n8n-api.sh script
+  if [ -f "scripts/n8n-api.sh" ]; then
+    if scripts/n8n-api.sh list-workflows >/dev/null 2>&1; then
+      echo "✅ n8n API authentication working"
+      return 0
+    else
+      echo "❌ n8n API authentication failed"
+      echo "   Check scripts/n8n-api.sh configuration"
+      return 1
+    fi
+  else
+    echo "❌ n8n-api.sh script not found"
+    echo "   Expected at: scripts/n8n-api.sh"
+    return 1
+  fi
+}
+
+run_doctor() {
+  echo "🩺 FlowForge System Check"
+  echo "========================"
+  
+  # Check required commands
+  local missing_deps=()
+  
+  for cmd in node npm jq curl nc; do
+    if ! command -v $cmd &> /dev/null; then
+      missing_deps+=($cmd)
+    else
+      echo "✅ $cmd installed"
+    fi
+  done
+  
+  if [ ${#missing_deps[@]} -ne 0 ]; then
+    echo "❌ Missing dependencies: ${missing_deps[*]}"
+    echo "   Install with: sudo apt update && sudo apt install -y ${missing_deps[*]}"
+    return 1
+  fi
+  
+  # Check n8n installation
+  if ! command -v n8n &> /dev/null; then
+    echo "❌ n8n not installed"
+    echo "   Install with: npm install -g n8n"
+    return 1
+  fi
+  echo "✅ n8n installed"
+  
+  # Check Claude Code CLI
+  if ! command -v claude &> /dev/null; then
+    echo "❌ claude CLI not installed"
+    echo "   Install with: npm install -g @anthropic-ai/claude-code"
+    return 1
+  fi
+  echo "✅ claude CLI installed"
+  
+  # Check n8n health
+  if check_n8n_health; then
+    echo ""
+    echo "🎯 Ready to run: make demo"
+  else
+    echo ""
+    echo "❌ System not ready. Fix issues above first."
+    echo "💡 Try: scripts/forge start"
+    return 1
+  fi
+}
+
+create_workflow() {
+  local prompt="$1"
+  
+  if [ -z "$prompt" ]; then
+    echo "Usage: forge create-workflow \"workflow description\""
+    echo "Example: forge create-workflow \"read my email and summarize it\""
+    return 1
+  fi
+  
+  # Check n8n health first
+  if ! check_n8n_health >/dev/null 2>&1; then
+    echo "❌ n8n is not healthy. Run 'forge doctor' for diagnosis."
+    return 1
+  fi
+  
+  echo "🤖 Generating workflow from prompt..."
+  
+  # Create prompt file with template context
+  cat > workflow.prompt.yaml <<EOF
+Generate a clean n8n workflow JSON for: $prompt
+
+Available Templates (use as reference):
+$(find templates -name "*.json" -exec echo "- {}" \; -exec head -20 {} \; -exec echo "" \; 2>/dev/null | head -100)
+
+Requirements:
+- Use n8n platform and follow the template patterns shown above
+- Include appropriate nodes for the task
+- Use proper node connections and positioning
+- Always include a "name" field for the workflow
+- Output ONLY valid JSON, no markdown, no explanations, no code blocks
+
+Generate the complete n8n workflow JSON object.
+EOF
+  
+  # Generate with Claude
+  if ! claude --print < workflow.prompt.yaml > workflow.json; then
+    echo "❌ Failed to generate workflow with Claude"
+    return 1
+  fi
+  
+  # Clean up potential markdown wrapper
+  if grep -q "\`\`\`json" workflow.json; then
+    sed -n '/\`\`\`json/,/\`\`\`/p' workflow.json | sed '1d;$d' > workflow_clean.json
+    mv workflow_clean.json workflow.json
+  fi
+  
+  # Remove any text before first {
+  sed -i '/^[^{]*$/d' workflow.json
+  
+  # Validate JSON
+  if ! jq empty workflow.json 2>/dev/null; then
+    echo "❌ Generated workflow is not valid JSON"
+    echo "See workflow.json for details"
+    return 1
+  fi
+  
+  echo "✅ Workflow generated and validated"
+  
+  # Create in n8n
+  echo "📡 Creating workflow in n8n..."
+  if WORKFLOW_RESPONSE=$(scripts/n8n-api.sh create-workflow workflow.json 2>&1); then
+    if echo "$WORKFLOW_RESPONSE" | jq -e '.id' >/dev/null 2>&1; then
+      WORKFLOW_ID=$(echo "$WORKFLOW_RESPONSE" | jq -r '.id')
+      echo "✅ Workflow created successfully with ID: $WORKFLOW_ID"
+      
+      # Open in browser
+      echo "🌐 Opening workflow in browser..."
+      if command -v xdg-open &> /dev/null; then
+        xdg-open "$N8N_HOST/workflow/$WORKFLOW_ID"
+      else
+        echo "Manual link: $N8N_HOST/workflow/$WORKFLOW_ID"
+      fi
+    else
+      echo "❌ Unexpected response format from n8n"
+      echo "$WORKFLOW_RESPONSE"
+      return 1
+    fi
+  else
+    echo "❌ Failed to create workflow in n8n"
+    echo "$WORKFLOW_RESPONSE"
+    return 1
+  fi
+}
+
+case "$COMMAND" in
+  install)
+    run_install
+    ;;
+  create-workflow)
+    create_workflow "$2"
+    ;;
+  start)
+    echo "🚀 Starting n8n..."
+    if pgrep -f "n8n" > /dev/null; then
+      echo "⚠️  n8n is already running"
+      check_n8n_health
+    else
+      echo "Starting n8n in background..."
+      nohup n8n > ~/n8n.log 2>&1 &
+      echo "Waiting for n8n to start..."
+      sleep 5
+      if check_n8n_health; then
+        echo "✅ n8n started successfully"
+        echo "🌐 Access n8n at: $N8N_HOST"
+      else
+        echo "❌ n8n failed to start properly"
+        echo "Check logs: tail -f ~/n8n.log"
+        exit 1
+      fi
+    fi
+    ;;
+  stop)
+    echo "🛑 Stopping n8n..."
+    if pgrep -f "n8n" > /dev/null; then
+      pkill -f "n8n"
+      echo "✅ n8n stopped"
+    else
+      echo "⚠️  n8n is not running"
+    fi
+    ;;
+  restart)
+    echo "🔄 Restarting n8n..."
+    if pgrep -f "n8n" > /dev/null; then
+      pkill -f "n8n"
+      echo "Stopped n8n"
+      sleep 2
+    fi
+    nohup n8n > ~/n8n.log 2>&1 &
+    echo "Starting n8n..."
+    sleep 5
+    if check_n8n_health; then
+      echo "✅ n8n restarted successfully"
+    else
+      echo "❌ n8n failed to restart"
+      exit 1
+    fi
+    ;;
+  validate)
+    echo "🔍 Validating workflow.json using ajv..."
+    if ! command -v ajv &> /dev/null; then
+      echo "Installing ajv-cli..."
+      npm install -g ajv-cli
+    fi
+    curl -s -o n8n-schema.json https://json.schemastore.org/n8n-workflow
+    ajv validate -s n8n-schema.json -d workflow.json
+    ;;
+  format)
+    echo "🧹 Formatting workflow.json with jq..."
+    if ! command -v jq &> /dev/null; then
+      echo "Please install jq first."
+      exit 1
+    fi
+    jq . workflow.json > tmp.json && mv tmp.json workflow.json
+    ;;
+  doctor)
+    run_doctor
+    ;;
+  health)
+    check_n8n_health
+    ;;
+  help|*)
+    echo "FlowForge CLI"
+    echo "Usage: forge [install|create-workflow|start|stop|restart|validate|format|doctor|health|help]"
+    echo ""
+    echo "Commands:"
+    echo "  install              - Install n8n and setup API script"
+    echo "  create-workflow \"..\" - Generate and create workflow from description"
+    echo "  start                - Start n8n in background"
+    echo "  stop                 - Stop n8n process"
+    echo "  restart              - Restart n8n process"
+    echo "  validate             - Validate workflow.json schema"
+    echo "  format               - Format workflow.json with jq"
+    echo "  doctor               - Full system health check"
+    echo "  health               - Check n8n status only"
+    echo "  help                 - Show this help"
+    echo ""
+    echo "Examples:"
+    echo "  forge create-workflow \"read my email and summarize it\""
+    echo "  forge create-workflow \"scrape news and send to slack\""
+    echo "  forge create-workflow \"backup database daily\""
+    ;;
+esac

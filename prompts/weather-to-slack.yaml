@@ -1,0 +1,9 @@
+task: "Generate an n8n workflow"
+context:
+  platform: n8n
+  mcp_tools: ["HTTP Request", "Function", "Slack"]
+purpose: "Check Jacksonville weather and notify Slack if rain > 50%"
+constraints:
+  - Use a JSON-based weather API
+  - Only send Slack message when rain is likely
+output_format: n8n_workflow_json
