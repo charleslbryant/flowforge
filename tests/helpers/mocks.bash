@@ -2,7 +2,7 @@
 # Mock functions for FlowForge tests
 
 # Mock curl to simulate n8n API responses
-mock_curl() {
+curl() {
   # Parse curl arguments to determine what to mock
   local url=""
   local method="GET"
@@ -63,154 +63,116 @@ mock_curl() {
   esac
 }
 
-# Mock n8n process management
-mock_n8n_process() {
-  local action="$1"
-  
-  case "$action" in
-    running)
-      # Mock pgrep to return a fake PID
-      pgrep() {
-        if [[ "$1" == "-f" && "$2" == "n8n" ]]; then
-          echo "12345"
-        fi
-      }
-      export -f pgrep
-      ;;
-    not_running)
-      # Mock pgrep to return nothing
-      pgrep() {
+# Mock n8n process management functions
+pgrep() {
+  if [[ "${N8N_PROCESS_RUNNING:-true}" == "true" ]]; then
+    if [[ "$1" == "-f" && "$2" == "n8n" ]]; then
+      echo "12345"
+      return 0
+    fi
+  fi
+  return 1
+}
+
+pkill() {
+  if [[ "$1" == "-f" && "$2" == "n8n" ]]; then
+    return 0
+  fi
+  return 1
+}
+
+nohup() {
+  if [[ -n "$TEST_TEMP_DIR" ]]; then
+    echo "n8n started successfully" > "$TEST_TEMP_DIR/n8n.log"
+  fi
+  return 0
+}
+
+# Mock network tools
+nc() {
+  if [[ "$1" == "-z" ]]; then
+    # Mock port check - return success (port is open)
+    return 0
+  fi
+}
+
+# Mock Claude CLI
+claude() {
+  if [[ "$1" == "--print" ]]; then
+    case "${CLAUDE_RESPONSE_TYPE:-success}" in
+      success)
+        create_test_workflow
+        ;;
+      error)
+        echo "Error: Claude API failed" >&2
         return 1
-      }
-      export -f pgrep
+        ;;
+      invalid_json)
+        echo "This is not valid JSON"
+        ;;
+    esac
+  else
+    echo "Claude CLI mock"
+  fi
+}
+
+# Mock jq for JSON processing
+jq() {
+  local behavior="${JQ_BEHAVIOR:-success}"
+  
+  case "$behavior" in
+    success)
+      if [[ "$1" == "empty" ]]; then
+        return 0  # Valid JSON
+      elif [[ "$1" == "." ]]; then
+        cat  # Pretty print
+      elif [[ "$1" == "-r" && "$2" == ".id" ]]; then
+        echo "mock-id-123"
+      elif [[ "$1" == "-e" && "$2" == ".id" ]]; then
+        return 0  # ID exists
+      else
+        echo "mock-jq-output"
+      fi
       ;;
-    start)
-      # Mock successful n8n start
-      nohup() {
-        echo "n8n started successfully" > "$TEST_TEMP_DIR/n8n.log"
-        return 0
-      }
-      export -f nohup
-      ;;
-    stop)
-      # Mock successful n8n stop
-      pkill() {
-        if [[ "$1" == "-f" && "$2" == "n8n" ]]; then
-          return 0
-        fi
-      }
-      export -f pkill
+    invalid_json)
+      if [[ "$1" == "empty" ]]; then
+        return 4  # Invalid JSON
+      fi
       ;;
   esac
 }
 
-# Mock network tools
-mock_network_tools() {
-  # Mock netcat (nc) for port checking
-  nc() {
-    if [[ "$1" == "-z" ]]; then
-      # Mock port check - return success (port is open)
-      return 0
-    fi
-  }
-  export -f nc
-  
-  # Mock curl for health checks
-  curl() {
-    mock_curl "$@"
-  }
-  export -f curl
-}
-
-# Mock Claude CLI
-mock_claude_cli() {
-  local response_type="${1:-success}"
-  
-  claude() {
-    if [[ "$1" == "--print" ]]; then
-      case "$response_type" in
-        success)
-          create_test_workflow
-          ;;
-        error)
-          echo "Error: Claude API failed" >&2
-          return 1
-          ;;
-        invalid_json)
-          echo "This is not valid JSON"
-          ;;
-      esac
-    else
-      echo "Claude CLI mock"
-    fi
-  }
-  export -f claude
-}
-
-# Mock jq for JSON processing
-mock_jq() {
-  local behavior="${1:-success}"
-  
-  jq() {
-    case "$behavior" in
-      success)
-        if [[ "$1" == "empty" ]]; then
-          return 0  # Valid JSON
-        elif [[ "$1" == "." ]]; then
-          cat  # Pretty print
-        elif [[ "$1" == "-r" && "$2" == ".id" ]]; then
-          echo "mock-id-123"
-        else
-          echo "mock-jq-output"
-        fi
-        ;;
-      invalid_json)
-        if [[ "$1" == "empty" ]]; then
-          return 4  # Invalid JSON
-        fi
-        ;;
-    esac
-  }
-  export -f jq
-}
-
 # Mock file system operations
-mock_filesystem() {
-  # Mock mktemp
-  mktemp() {
-    if [[ "$1" == "-d" ]]; then
-      echo "$TEST_TEMP_DIR/mock_temp_dir"
-      mkdir -p "$TEST_TEMP_DIR/mock_temp_dir"
-    else
-      echo "$TEST_TEMP_DIR/mock_temp_file"
-      touch "$TEST_TEMP_DIR/mock_temp_file"
-    fi
-  }
-  export -f mktemp
+mktemp() {
+  if [[ "$1" == "-d" ]]; then
+    local dir="$TEST_TEMP_DIR/mock_temp_dir_$$"
+    mkdir -p "$dir"
+    echo "$dir"
+  else
+    local file="$TEST_TEMP_DIR/mock_temp_file_$$"
+    touch "$file"
+    echo "$file"
+  fi
 }
 
 # Mock system commands
-mock_system_commands() {
-  # Mock command existence checks
-  command() {
-    if [[ "$1" == "-v" ]]; then
-      case "$2" in
-        node|npm|jq|curl|nc|claude|bats)
-          echo "/usr/bin/$2"
-          ;;
-        *)
-          return 1
-          ;;
-      esac
-    fi
-  }
-  export -f command
-  
-  # Mock xdg-open for browser opening
-  xdg-open() {
-    echo "Opening: $1"
-  }
-  export -f xdg-open
+command() {
+  if [[ "$1" == "-v" ]]; then
+    case "$2" in
+      node|npm|jq|curl|nc|claude|bats)
+        echo "/usr/bin/$2"
+        return 0
+        ;;
+      *)
+        return 1
+        ;;
+    esac
+  fi
+}
+
+xdg-open() {
+  echo "Opening: $1"
+  return 0
 }
 
 # Reset all mocks
@@ -220,22 +182,26 @@ reset_mocks() {
 
 # Setup common mocks for most tests
 setup_common_mocks() {
-  mock_network_tools
-  mock_claude_cli
-  mock_jq
-  mock_filesystem
-  mock_system_commands
+  export -f curl
+  export -f jq
+  export -f claude
+  export -f pgrep
+  export -f pkill
+  export -f nc
+  export -f command
+  export -f xdg-open
+  export -f mktemp
 }
 
 # Setup mocks for API tests
 setup_api_mocks() {
   setup_common_mocks
-  mock_n8n_process running
+  export N8N_PROCESS_RUNNING=true
 }
 
 # Setup mocks for failing scenarios
 setup_failing_mocks() {
-  mock_n8n_process not_running
-  mock_claude_cli error
-  mock_jq invalid_json
+  export N8N_PROCESS_RUNNING=false
+  export CLAUDE_RESPONSE_TYPE=error
+  export JQ_BEHAVIOR=invalid_json
 }

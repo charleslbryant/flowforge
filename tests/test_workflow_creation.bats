@@ -63,7 +63,7 @@ teardown() {
       cat << 'EOF'
 Here's your workflow:
 
-```json
+\`\`\`json
 {
   "name": "Email Workflow",
   "nodes": [
@@ -81,7 +81,7 @@ Here's your workflow:
     "executionOrder": "v1"
   }
 }
-```
+\`\`\`
 
 This workflow will handle your email processing.
 EOF
@@ -96,7 +96,7 @@ EOF
   assert_file_exists "workflow.json"
   run cat workflow.json
   assert_output_not_contains "Here's your workflow"
-  assert_output_not_contains "```json"
+  assert_output_not_contains "\`\`\`json"
   assert_output_not_contains "This workflow will"
   assert_output_contains '"name": "Email Workflow"'
 }

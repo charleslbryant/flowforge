@@ -4,7 +4,7 @@
 # Common setup for all tests
 setup_test_environment() {
   # Create temporary directory for test
-  TEST_TEMP_DIR=$(mktemp -d)
+  TEST_TEMP_DIR=$(command mktemp -d)
   export TEST_TEMP_DIR
   
   # Save original working directory
@@ -17,6 +17,11 @@ setup_test_environment() {
   
   # Disable actual n8n operations in tests
   export FLOWFORGE_TEST_MODE=1
+  
+  # Set default mock behavior
+  export N8N_PROCESS_RUNNING=true
+  export CLAUDE_RESPONSE_TYPE=success
+  export JQ_BEHAVIOR=success
 }
 
 # Common teardown for all tests
@@ -33,6 +38,7 @@ teardown_test_environment() {
   
   # Unset test environment variables
   unset N8N_API_KEY N8N_HOST N8N_PORT FLOWFORGE_TEST_MODE TEST_TEMP_DIR
+  unset N8N_PROCESS_RUNNING CLAUDE_RESPONSE_TYPE JQ_BEHAVIOR
 }
 
 # Check if command exists

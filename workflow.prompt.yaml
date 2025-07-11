@@ -1,9 +1,13 @@
-Generate a clean n8n workflow JSON for: send me daily weather updates
+Generate a clean n8n workflow JSON for: test workflow
+
+Available Templates (use as reference):
+
 
 Requirements:
-- Use n8n platform
+- Use n8n platform and follow the template patterns shown above
 - Include appropriate nodes for the task
-- Use proper node connections
+- Use proper node connections and positioning
+- Always include a "name" field for the workflow
 - Output ONLY valid JSON, no markdown, no explanations, no code blocks
 
 Generate the complete n8n workflow JSON object.

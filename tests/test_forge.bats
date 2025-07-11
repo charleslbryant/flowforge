@@ -31,7 +31,7 @@ teardown() {
 }
 
 @test "forge health checks n8n status" {
-  mock_n8n_process running
+  export N8N_PROCESS_RUNNING=true
   
   run scripts/forge health
   [ "$status" -eq 0 ]
@@ -41,7 +41,7 @@ teardown() {
 }
 
 @test "forge health fails when n8n not running" {
-  mock_n8n_process not_running
+  export N8N_PROCESS_RUNNING=false
   
   run scripts/forge health
   [ "$status" -eq 1 ]
@@ -73,8 +73,7 @@ teardown() {
 }
 
 @test "forge start starts n8n successfully" {
-  mock_n8n_process not_running
-  mock_n8n_process start
+  export N8N_PROCESS_RUNNING=false
   
   run scripts/forge start
   [ "$status" -eq 0 ]
@@ -83,7 +82,7 @@ teardown() {
 }
 
 @test "forge start handles already running n8n" {
-  mock_n8n_process running
+  export N8N_PROCESS_RUNNING=true
   
   run scripts/forge start
   [ "$status" -eq 0 ]
@@ -91,8 +90,7 @@ teardown() {
 }
 
 @test "forge stop stops n8n successfully" {
-  mock_n8n_process running
-  mock_n8n_process stop
+  export N8N_PROCESS_RUNNING=true
   
   run scripts/forge stop
   [ "$status" -eq 0 ]
@@ -101,7 +99,7 @@ teardown() {
 }
 
 @test "forge stop handles not running n8n" {
-  mock_n8n_process not_running
+  export N8N_PROCESS_RUNNING=false
   
   run scripts/forge stop
   [ "$status" -eq 0 ]
@@ -109,9 +107,7 @@ teardown() {
 }
 
 @test "forge restart restarts n8n" {
-  mock_n8n_process running
-  mock_n8n_process stop
-  mock_n8n_process start
+  export N8N_PROCESS_RUNNING=true
   
   run scripts/forge restart
   [ "$status" -eq 0 ]
@@ -143,7 +139,7 @@ teardown() {
 }
 
 @test "forge create-workflow checks n8n health first" {
-  mock_n8n_process not_running
+  export N8N_PROCESS_RUNNING=false
   
   run scripts/forge create-workflow "test workflow"
   [ "$status" -eq 1 ]
@@ -151,8 +147,8 @@ teardown() {
 }
 
 @test "forge create-workflow generates and creates workflow" {
-  mock_n8n_process running
-  mock_claude_cli success
+  export N8N_PROCESS_RUNNING=true
+  export CLAUDE_RESPONSE_TYPE=success
   
   run scripts/forge create-workflow "test workflow"
   [ "$status" -eq 0 ]
@@ -163,8 +159,8 @@ teardown() {
 }
 
 @test "forge create-workflow handles Claude generation failure" {
-  mock_n8n_process running
-  mock_claude_cli error
+  export N8N_PROCESS_RUNNING=true
+  export CLAUDE_RESPONSE_TYPE=error
   
   run scripts/forge create-workflow "test workflow"
   [ "$status" -eq 1 ]
@@ -172,9 +168,9 @@ teardown() {
 }
 
 @test "forge create-workflow handles invalid JSON from Claude" {
-  mock_n8n_process running
-  mock_claude_cli invalid_json
-  mock_jq invalid_json
+  export N8N_PROCESS_RUNNING=true
+  export CLAUDE_RESPONSE_TYPE=invalid_json
+  export JQ_BEHAVIOR=invalid_json
   
   run scripts/forge create-workflow "test workflow"
   [ "$status" -eq 1 ]
@@ -182,7 +178,7 @@ teardown() {
 }
 
 @test "forge create-workflow cleans markdown wrapped JSON" {
-  mock_n8n_process running
+  export N8N_PROCESS_RUNNING=true
   
   # Create a workflow with markdown wrapper
   claude() {
@@ -211,8 +207,8 @@ EOF
 }
 
 @test "forge create-workflow opens browser on success" {
-  mock_n8n_process running
-  mock_claude_cli success
+  export N8N_PROCESS_RUNNING=true
+  export CLAUDE_RESPONSE_TYPE=success
   
   run scripts/forge create-workflow "test workflow"
   [ "$status" -eq 0 ]
