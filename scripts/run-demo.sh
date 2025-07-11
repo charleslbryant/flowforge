@@ -75,9 +75,14 @@ fi
 success_msg "Workflow JSON cleaned and validated"
 
 echo "📡 Sending workflow to n8n..."
+# Check if API key is set
+if [ -z "$N8N_API_KEY" ]; then
+  error_exit "N8N_API_KEY environment variable not set. Generate your API key at: $N8N_HOST/settings/api"
+fi
+
 # Store the API response for error checking
-API_RESPONSE=$(curl -s -X POST "$N8N_HOST/rest/workflows" \
-  -H "Authorization: Bearer $N8N_API_KEY" \
+API_RESPONSE=$(curl -s -X POST "$N8N_HOST/api/v1/workflows" \
+  -H "X-N8N-API-KEY: $N8N_API_KEY" \
   -H "Content-Type: application/json" \
   -d @workflow.json)
 

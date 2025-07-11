@@ -90,11 +90,10 @@ scripts/forge create-workflow "send me daily weather updates"
 
 #### Authentication Flow
 ```bash
-# Session-based authentication
-N8N_SESSION_COOKIES='...' # Browser session cookies
-
-# API key authentication
+# API key authentication (recommended)
 N8N_API_KEY='...' # JWT token from n8n settings
+
+# Generate your API key at: http://localhost:5678/settings/api
 ```
 
 #### API Operations Available

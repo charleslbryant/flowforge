@@ -23,13 +23,20 @@
 COMMAND=${1:-list-workflows}
 shift
 
-# Session cookies and API key (from environment variables)
-# To use this script, you must set these environment variables:
-# export N8N_SESSION_COOKIES="your-session-cookies-here"
+# n8n API key (from environment variable)
+# To use this script, you must set this environment variable:
 # export N8N_API_KEY="your-api-key-here"
+# Generate your API key at: http://localhost:5678/settings/api
 
-N8N_SESSION_COOKIES="${N8N_SESSION_COOKIES:-}"
 N8N_API_KEY="${N8N_API_KEY:-}"
+
+# Check if API key is set
+if [ -z "$N8N_API_KEY" ]; then
+  echo "❌ N8N_API_KEY environment variable not set"
+  echo "Generate your API key at: http://localhost:5678/settings/api"
+  echo "Then run: export N8N_API_KEY=\"your-api-key-here\""
+  exit 1
+fi
 
 # Core API call function
 n8n_api_call() {
@@ -40,23 +47,15 @@ n8n_api_call() {
   if [ -n "$data" ]; then
     curl -s "http://localhost:5678/api/v1/${endpoint}" \
       -X "$method" \
-      -H "Accept-Language: en-US,en;q=0.9" \
-      -H "Connection: keep-alive" \
-      -b "$N8N_SESSION_COOKIES" \
       -H "X-N8N-API-KEY: $N8N_API_KEY" \
       -H "accept: application/json" \
-      -H "Referer: http://localhost:5678/api/v1/docs/" \
       -H "Content-Type: application/json" \
       -d "$data"
   else
     curl -s "http://localhost:5678/api/v1/${endpoint}" \
       -X "$method" \
-      -H "Accept-Language: en-US,en;q=0.9" \
-      -H "Connection: keep-alive" \
-      -b "$N8N_SESSION_COOKIES" \
       -H "X-N8N-API-KEY: $N8N_API_KEY" \
       -H "accept: application/json" \
-      -H "Referer: http://localhost:5678/api/v1/docs/" \
       -H "Content-Type: application/json"
   fi
 }
