@@ -5,7 +5,7 @@ N8N_PORT=5678
 N8N_HOST="http://localhost:$N8N_PORT"
 
 echo "📦 Installing n8n and Claude Code..."
-npm install -g n8n @anthropic-ai/claude-code
+npm install -g n8n @anthropic-ai/claude-code bats
 
 echo "🚀 Starting n8n on port $N8N_PORT..."
 nohup n8n > ~/n8n.log 2>&1 &

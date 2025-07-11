@@ -1,0 +1,134 @@
+{
+  "simple_workflow": {
+    "name": "Simple Test Workflow",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "start-node",
+        "name": "Start",
+        "type": "n8n-nodes-base.start",
+        "typeVersion": 1,
+        "position": [240, 300]
+      }
+    ],
+    "connections": {},
+    "settings": {
+      "executionOrder": "v1"
+    }
+  },
+  "email_workflow": {
+    "name": "Email Processing Workflow",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "value": "0 */30 * * * *"
+              }
+            ]
+          }
+        },
+        "id": "schedule-trigger",
+        "name": "Schedule Trigger",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [240, 300]
+      },
+      {
+        "parameters": {
+          "protocol": "imap",
+          "host": "imap.gmail.com",
+          "port": 993,
+          "secure": true,
+          "email": "test@example.com",
+          "password": "test-password"
+        },
+        "id": "email-imap",
+        "name": "Read Email",
+        "type": "n8n-nodes-base.emailReadImap",
+        "typeVersion": 2.1,
+        "position": [460, 300]
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Read Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    }
+  },
+  "http_workflow": {
+    "name": "HTTP API Workflow",
+    "nodes": [
+      {
+        "parameters": {
+          "url": "https://api.example.com/data",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "json"
+              }
+            }
+          }
+        },
+        "id": "http-request",
+        "name": "HTTP Request",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [240, 300]
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{json: {processed: true, data: $input.first().json}}];"
+        },
+        "id": "code-node",
+        "name": "Process Data",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [460, 300]
+      }
+    ],
+    "connections": {
+      "HTTP Request": {
+        "main": [
+          [
+            {
+              "node": "Process Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    }
+  },
+  "invalid_workflow": {
+    "name": "Invalid Workflow",
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "missing-type-node",
+        "name": "Invalid Node"
+      }
+    ],
+    "connections": {},
+    "settings": {
+      "executionOrder": "v1"
+    }
+  }
+}

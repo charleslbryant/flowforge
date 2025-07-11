@@ -129,5 +129,16 @@ secrets.json
 # generated-*.json
 # temp-*.json
 
+# Test artifacts
+*.test.log
+test-results/
+coverage/
+test_temp_*/
+mock_temp_*/
+
+# Bats test artifacts
+*.bats.log
+.bats/
+
 # Claude Code specific
 .claude/

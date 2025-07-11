@@ -1,0 +1,158 @@
+{
+  "api_responses": {
+    "list_workflows": {
+      "data": [
+        {
+          "id": "workflow-123",
+          "name": "Test Workflow",
+          "active": false,
+          "createdAt": "2025-01-01T00:00:00.000Z",
+          "updatedAt": "2025-01-01T00:00:00.000Z",
+          "tags": []
+        },
+        {
+          "id": "workflow-456",
+          "name": "Another Workflow",
+          "active": true,
+          "createdAt": "2025-01-01T00:00:00.000Z",
+          "updatedAt": "2025-01-01T00:00:00.000Z",
+          "tags": []
+        }
+      ]
+    },
+    "get_workflow": {
+      "id": "workflow-123",
+      "name": "Test Workflow",
+      "active": false,
+      "nodes": [
+        {
+          "parameters": {},
+          "id": "start-node",
+          "name": "Start",
+          "type": "n8n-nodes-base.start",
+          "typeVersion": 1,
+          "position": [240, 300]
+        }
+      ],
+      "connections": {},
+      "settings": {
+        "executionOrder": "v1"
+      },
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    "create_workflow": {
+      "id": "workflow-new-789",
+      "name": "New Workflow",
+      "active": false,
+      "nodes": [
+        {
+          "parameters": {},
+          "id": "start-node",
+          "name": "Start",
+          "type": "n8n-nodes-base.start",
+          "typeVersion": 1,
+          "position": [240, 300]
+        }
+      ],
+      "connections": {},
+      "settings": {
+        "executionOrder": "v1"
+      },
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    "list_credentials": {
+      "data": [
+        {
+          "id": "cred-123",
+          "name": "Test Credential",
+          "type": "httpBasicAuth",
+          "createdAt": "2025-01-01T00:00:00.000Z",
+          "updatedAt": "2025-01-01T00:00:00.000Z"
+        },
+        {
+          "id": "cred-456",
+          "name": "Gmail Credential",
+          "type": "gmailOAuth2",
+          "createdAt": "2025-01-01T00:00:00.000Z",
+          "updatedAt": "2025-01-01T00:00:00.000Z"
+        }
+      ]
+    },
+    "list_executions": {
+      "data": [
+        {
+          "id": "exec-123",
+          "workflowId": "workflow-123",
+          "status": "success",
+          "startedAt": "2025-01-01T00:00:00.000Z",
+          "finishedAt": "2025-01-01T00:01:00.000Z",
+          "executionTime": 60000
+        },
+        {
+          "id": "exec-456",
+          "workflowId": "workflow-123",
+          "status": "error",
+          "startedAt": "2025-01-01T00:00:00.000Z",
+          "finishedAt": "2025-01-01T00:00:30.000Z",
+          "executionTime": 30000,
+          "error": "Node 'HTTP Request' failed"
+        }
+      ]
+    }
+  },
+  "error_responses": {
+    "unauthorized": {
+      "message": "Unauthorized",
+      "code": 401
+    },
+    "not_found": {
+      "message": "Workflow not found",
+      "code": 404
+    },
+    "validation_error": {
+      "message": "request/body must NOT have additional properties",
+      "code": 400
+    },
+    "rate_limit": {
+      "message": "Rate limit exceeded",
+      "code": 429
+    },
+    "server_error": {
+      "message": "Internal server error",
+      "code": 500
+    }
+  },
+  "claude_responses": {
+    "valid_workflow": {
+      "name": "Generated Workflow",
+      "nodes": [
+        {
+          "parameters": {
+            "url": "https://api.weather.com/v1/current",
+            "options": {
+              "response": {
+                "response": {
+                  "responseFormat": "json"
+                }
+              }
+            }
+          },
+          "id": "weather-api",
+          "name": "Get Weather",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 4.2,
+          "position": [240, 300]
+        }
+      ],
+      "connections": {},
+      "settings": {
+        "executionOrder": "v1"
+      }
+    },
+    "markdown_wrapped": "Here's your workflow:\n\n```json\n{\n  \"name\": \"Weather Workflow\",\n  \"nodes\": []\n}\n```\n\nThis workflow fetches weather data.",
+    "invalid_json": "This is not valid JSON content",
+    "empty_response": ""
+  }
+}

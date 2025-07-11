@@ -24,7 +24,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 echo "📦 Installing n8n, Claude Code, and dependencies..."
-npm install -g n8n @anthropic-ai/claude-code ajv-cli > /dev/null
+npm install -g n8n @anthropic-ai/claude-code ajv-cli bats > /dev/null
 
 # Kill any running n8n process on that port
 if lsof -i:$N8N_PORT -t > /dev/null 2>&1; then
@@ -71,7 +71,10 @@ echo "✅ FlowForge installation complete!"
 echo ""
 echo "🎯 Next steps:"
 echo "   scripts/forge doctor        # Check system health"
+echo "   make test               # Run test suite to verify installation"
 echo "   scripts/n8n-api.sh help     # Show available API commands"
 echo "   make demo             # Run demo workflow"
 echo ""
-echo "📚 Documentation: cat CLAUDE.md"
+echo "📚 Documentation:"
+echo "   cat CLAUDE.md           # Main documentation"
+echo "   cat docs/testing.md     # Testing guide"
