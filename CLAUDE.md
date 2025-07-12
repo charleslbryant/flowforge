@@ -1,24 +1,116 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI assistants when working with code in this repository.
+
+## AI Assistant Identity
+AI assistants working on this project should identify themselves as "George" in commits and contributions to maintain consistent attribution across different AI models and sessions.
 
 ## Project Overview
 
-FlowForge is an AI-powered workflow automation tool that integrates Claude Code with n8n workflow management. It generates n8n workflows from natural language prompts using a custom shell script that provides direct API access to n8n.
+FlowForge is an AI-powered workflow automation CLI tool that integrates Claude Code with n8n workflow management. It generates n8n workflows from natural language prompts and has two implementations:
+
+1. **Bash Implementation** (`/scripts/`) - Production-ready original implementation
+2. **.NET Implementation** (`/dotnet/`) - Modern port with improved architecture (in development)
+
+## Context Management
+
+### Session Startup (Required Reading)
+1. **Product Context**: Read `/docs/product/` for foundational product vision and strategy
+2. **Architecture**: Read `/docs/architecture.md` for FlowForge overview and dual-implementation approach
+3. **Current State**: Read `/docs/session-context/CURRENT_STATE.md` for development progress
+4. **Task Queue**: Read `/docs/session-context/NEXT_TASKS.md` for prioritized work
+5. **Focus**: Select ONE task from "Now" priority and work on it using TDD approach
+
+### Session Workflow
+1. Complete session startup reading (above)
+2. Work on ONE task from the "Now" priority queue
+3. Use Test-Driven Development (TDD) approach for .NET development
+4. Update relevant ADRs for architectural decisions
+5. Update documentation as needed
+6. Commit changes with descriptive message
+7. Update context files for next session
+8. End session (clear context)
+
+### Context Files
+- `product/product-vision.md` - Long-term product vision and goals
+- `product/product-strategy.md` - Go-to-market and growth strategy
+- `architecture.md` - Technical overview and dual-implementation approach
+- `CURRENT_STATE.md` - Current project state and development progress
+- `NEXT_TASKS.md` - Prioritized task queue linked to GitHub Issues
+- `ACTIVE_SESSION.md` - Current session progress tracking
 
 ## Key Architecture
 
+### Bash Implementation (`/scripts/`)
 - **`forge`** - Main CLI tool (bash script) that handles installation, validation, and formatting
 - **`n8n-api.sh`** - Custom shell script providing comprehensive n8n API access
 - **`workflow.json`** - Generated n8n workflow file (populated by Claude using the API script)
 - **`workflow.prompt.yaml`** - Structured prompt template for workflow generation
-- **`prompts/`** - Directory containing YAML prompt templates for different workflow types
-- **`scripts/`** - Installation and utility scripts
+- **`templates/`** - Directory containing JSON workflow templates
 - **API Integration** - Direct n8n API access through authenticated shell script
+
+### .NET Implementation (`/dotnet/`)
+- **Commands Layer** - CLI command implementations using Spectre.Console.Cli
+- **Services Layer** - Business logic (HealthChecking, ProcessManagement, SystemChecking)
+- **Infrastructure Layer** - External dependencies (Http, Process)
+- **Test-Driven Development** - Comprehensive test coverage with xUnit and Moq
+- **Clean Architecture** - Proper separation of concerns and dependency injection
 
 ## Common Commands
 
-### n8n Process Management
+### Flow Metrics Commands
+
+#### Generate Flow Analysis Reports
+```bash
+# Generate comprehensive flow metrics analysis
+./scripts/flow-analysis.sh
+
+# View current flow dashboard
+cat docs/metrics/reports/dashboard.md
+
+# View weekly summary
+cat docs/metrics/reports/weekly-summary.md
+```
+
+### Task Management Commands
+
+#### Review Available Work
+```bash
+# Show unassigned tasks ready for work
+gh issue list --label "task" --no-assignee --label "now,next" --json number,title,labels
+
+# Show my currently assigned tasks
+gh issue list --assignee "charleslbryant" --label "task" --state "open" --json number,title,labels
+
+# Show all PRDs and CRDs for context
+gh issue list --label "prd,crd" --state "open" --json number,title,labels
+```
+
+#### Task Assignment and Management
+```bash
+# Assign task to user and prioritize
+gh issue edit [number] --add-assignee "charleslbryant"
+gh issue edit [number] --add-label "now" --remove-label "next,future"
+
+# Create new issues collaboratively
+gh issue create --title "[PRD/CRD/Task]: [Title]" --body-file temp.md --label "[appropriate-labels]"
+```
+
+### .NET Development Commands
+```bash
+# Build and test .NET implementation
+cd dotnet
+dotnet build                    # Build the solution
+dotnet test                     # Run all tests
+dotnet run --project src/FlowForge.Console -- health    # Run health command
+dotnet run --project src/FlowForge.Console -- doctor    # Run doctor command
+dotnet run --project src/FlowForge.Console -- start     # Run start command
+
+# TDD Development Workflow
+dotnet test --watch             # Continuous testing during development
+```
+
+### n8n Process Management (Bash Implementation)
 ```bash
 # Start n8n in background
 scripts/forge start
