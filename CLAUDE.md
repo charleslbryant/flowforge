@@ -24,12 +24,16 @@ FlowForge is an AI-powered workflow automation CLI tool that integrates Claude C
 ### Session Workflow
 1. Complete session startup reading (above)
 2. Work on ONE task from the "Now" priority queue
-3. Use Test-Driven Development (TDD) approach for .NET development
-4. Update relevant ADRs for architectural decisions
-5. Update documentation as needed
-6. Commit changes with descriptive message
-7. Update context files for next session
-8. End session (clear context)
+3. **Assign GitHub issues** to self before starting work
+4. **Create feature branch** for the GitHub issue(s)
+5. Use Test-Driven Development (TDD) approach for .NET development
+6. Update relevant ADRs for architectural decisions
+7. Update documentation as needed
+8. **Commit changes** to feature branch with George attribution
+9. **Create Pull Request** with comprehensive description
+10. **Close completed GitHub issues** with completion comments
+11. Update context files for next session
+12. End session (clear context)
 
 ### Context Files
 - `product/product-vision.md` - Long-term product vision and goals
@@ -94,6 +98,112 @@ gh issue edit [number] --add-label "now" --remove-label "next,future"
 
 # Create new issues collaboratively
 gh issue create --title "[PRD/CRD/Task]: [Title]" --body-file temp.md --label "[appropriate-labels]"
+
+# Close completed issues with comments
+gh issue close [number] --comment "✅ Completed: [description of work done]"
+```
+
+### Git Workflow and Commit Standards
+
+#### Commit Message Format
+All AI assistant commits must use this format:
+```bash
+git commit -m "$(cat <<'EOF'
+Brief descriptive title of changes
+
+- Bullet point list of key changes
+- Include technical details and scope
+- Reference resolved GitHub issues if applicable
+- Resolves GitHub issues #[number], #[number]
+
+🤖 Generated with AI Assistant (George)
+
+Co-Authored-By: George <george@decoupledlogic.com>
+EOF
+)"
+```
+
+#### Complete Git Ops Development Workflow
+1. **Assignment**: Assign relevant GitHub issues to "charleslbryant"
+2. **Branch Creation**: Create feature branch for the GitHub issue
+   ```bash
+   git checkout -b feature/issue-[number]-[brief-description]
+   # Example: git checkout -b feature/issue-10-stop-command
+   ```
+3. **Development**: Implement features using TDD approach on the feature branch
+4. **Testing**: Ensure all tests pass before committing
+5. **Commit**: Use standardized commit message format with George attribution
+6. **Branch Sync**: Pull latest changes and merge main into feature branch
+   ```bash
+   git checkout main
+   git pull origin main
+   git checkout feature/issue-[number]-[brief-description]
+   git merge main
+   ```
+7. **Push Branch**: Push feature branch to remote
+   ```bash
+   git push -u origin feature/issue-[number]-[brief-description]
+   ```
+8. **Pull Request**: Create PR using GitHub CLI with auto-delete enabled
+   ```bash
+   gh pr create --title "[Brief description]" --body "$(cat <<'EOF'
+   ## Summary
+   - Bullet point summary of changes
+   - Technical implementation details
+   - Test coverage information
+   
+   ## Resolves
+   - Closes #[issue-number]
+   
+   ## Test Plan
+   - [ ] All existing tests pass
+   - [ ] New tests added for new functionality
+   - [ ] Manual testing completed
+   
+   🤖 Generated with AI Assistant (George)
+   EOF
+   )"
+   ```
+9. **PR Merge and Cleanup**: Merge PR and clean up branches
+   ```bash
+   # Merge the PR (this will auto-close linked issues if properly formatted)
+   gh pr merge --squash --delete-branch
+   
+   # Switch back to main and pull latest changes
+   git checkout main
+   git pull origin main
+   
+   # Delete local feature branch
+   git branch -d feature/issue-[number]-[brief-description]
+   
+   # Verify branch cleanup
+   git branch -a  # Should not show the deleted feature branch
+   ```
+10. **Issue Management**: Verify GitHub issues were auto-closed by PR merge
+11. **Documentation**: Update relevant documentation and context files
+
+#### Branch Cleanup Utilities
+```bash
+# Clean up all merged local branches (run periodically)
+git branch --merged main | grep -v "main\|master" | xargs -n 1 git branch -d
+
+# Clean up remote tracking branches that no longer exist on remote
+git remote prune origin
+
+# List all local branches to verify cleanup
+git branch -a
+
+# Force delete unmerged local branches (use with caution)
+# git branch -D feature/issue-[number]-[brief-description]
+```
+
+#### Repository Health Check
+```bash
+# Check for stale branches (branches that haven't been updated in 30+ days)
+gh api repos/:owner/:repo/branches | jq '.[] | select(.commit.commit.author.date < (now - 2592000 | strftime("%Y-%m-%dT%H:%M:%SZ"))) | .name'
+
+# View all open PRs to ensure they're still relevant
+gh pr list --state open
 ```
 
 ### .NET Development Commands
