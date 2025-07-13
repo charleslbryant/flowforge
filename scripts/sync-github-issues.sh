@@ -24,7 +24,11 @@ mkdir -p docs/github-issues/sync
 echo "Fetching GitHub Issues..."
 
 # Fetch all issues and save to local files
-gh issue list --limit 100 --json number,title,body,labels,assignees,state,createdAt,updatedAt --jq '.[] | "\(.number) \(.title) \(.state)"' | while read number title state; do
+gh issue list --limit 100 --json number,title,state | jq -c '.[]' | while read -r issue; do
+    number=$(echo "$issue" | jq -r '.number')
+    title=$(echo "$issue" | jq -r '.title')
+    state=$(echo "$issue" | jq -r '.state')
+    
     echo "Syncing Issue #$number: $title"
     
     # Get full issue content
@@ -45,7 +49,7 @@ gh issue list --limit 100 --json number,title,body,labels,assignees,state,create
 done
 
 echo "Creating sync summary..."
-cat > docs/github-issues/sync/README.md << 'EOF'
+cat > docs/github-issues/sync/README.md << EOF
 # GitHub Issues Sync
 
 This directory contains automatically synced copies of GitHub Issues.

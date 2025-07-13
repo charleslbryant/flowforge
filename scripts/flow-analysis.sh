@@ -86,7 +86,12 @@ generate_throughput_report() {
     local lcl=$(echo "scale=2; $mean - (3 * $std_dev)" | bc)
     
     # Ensure LCL is not negative
-    lcl=$(echo "if ($lcl < 0) 0 else $lcl" | bc)
+    lcl=$(echo "$lcl < 0" | bc -l)
+    if [ "$lcl" -eq 1 ]; then
+        lcl="0.00"
+    else
+        lcl=$(echo "scale=2; $mean - (3 * $std_dev)" | bc)
+    fi
     
     cat > "$REPORTS_DIR/throughput-analysis.md" << EOF
 # Throughput Analysis (Last 30 Days)
