@@ -101,7 +101,7 @@ EOF
 # Add 'future' priority issues
 gh issue list --label "future" --limit 5 --json number,title,labels,assignees --jq '.[] | "1. [ ] \(.title) - [#\(.number)](https://github.com/charleslbryant/flowforge/issues/\(.number))"' >> docs/session-context/NEXT_TASKS_GENERATED.md
 
-cat >> docs/session-context/NEXT_TASKS_GENERATED.md << 'EOF'
+cat >> docs/session-context/NEXT_TASKS_GENERATED.md << EOF
 
 ---
 *Auto-generated from GitHub Issues. Last updated: $(date)*

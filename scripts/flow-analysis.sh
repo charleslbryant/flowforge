@@ -24,7 +24,7 @@ calculate_flow_times() {
     fi
     
     # Extract key timestamps
-    local created_at=$(jq -r '.created_at' "$issue_file")
+    local created_at=$(jq -r '.createdAt' "$issue_file")
     local closed_at=$(jq -r '.closed_at // empty' "$issue_file")
     
     if [ -z "$closed_at" ]; then
@@ -86,11 +86,9 @@ generate_throughput_report() {
     local lcl=$(echo "scale=2; $mean - (3 * $std_dev)" | bc)
     
     # Ensure LCL is not negative
-    lcl=$(echo "$lcl < 0" | bc -l)
-    if [ "$lcl" -eq 1 ]; then
+    local is_negative=$(echo "$lcl < 0" | bc -l)
+    if [ "$is_negative" -eq 1 ]; then
         lcl="0.00"
-    else
-        lcl=$(echo "scale=2; $mean - (3 * $std_dev)" | bc)
     fi
     
     cat > "$REPORTS_DIR/throughput-analysis.md" << EOF
