@@ -5,6 +5,7 @@ public interface IProcessManager
     Task<bool> IsN8nRunningAsync(CancellationToken cancellationToken);
     Task<ProcessStartResult> StartN8nAsync(CancellationToken cancellationToken);
     Task<bool> StopN8nAsync(CancellationToken cancellationToken);
+    Task<ProcessOperationResult> StopN8nAsyncEnhanced(CancellationToken cancellationToken);
 }
 
 public class ProcessStartResult
