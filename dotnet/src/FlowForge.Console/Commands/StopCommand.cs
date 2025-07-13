@@ -2,6 +2,7 @@ using FlowForge.Console.Services.ProcessManagement;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
 using Spectre.Console.Cli;
+using System.Linq;
 
 namespace FlowForge.Console.Commands;
 
@@ -27,29 +28,32 @@ public class StopCommand : AsyncCommand
         AnsiConsole.MarkupLine("[red]🛑 Stopping n8n...[/]");
         AnsiConsole.WriteLine();
 
-        // Check if n8n is running
-        var isRunning = await _processManager.IsN8nRunningAsync(CancellationToken.None);
+        var stopResult = await _processManager.StopN8nAsyncEnhanced(CancellationToken.None);
         
-        if (!isRunning)
+        if (stopResult.Success)
         {
-            AnsiConsole.MarkupLine("[yellow]⚠️  n8n is not currently running[/]");
-            return 0;
-        }
-
-        // n8n is running - stop it
-        AnsiConsole.MarkupLine("[blue]Stopping n8n process...[/]");
-        
-        var stopResult = await _processManager.StopN8nAsync(CancellationToken.None);
-        
-        if (stopResult)
-        {
-            AnsiConsole.MarkupLine("[green]✅ n8n stopped successfully[/]");
+            AnsiConsole.MarkupLine($"[green]✅ {stopResult.Message}[/]");
             return 0;
         }
         else
         {
-            AnsiConsole.MarkupLine("[red]❌ Failed to stop n8n process[/]");
-            AnsiConsole.MarkupLine("[gray]💡 Try manually stopping with: pkill -f n8n[/]");
+            AnsiConsole.MarkupLine($"[red]❌ {stopResult.Message}[/]");
+            
+            if (!string.IsNullOrWhiteSpace(stopResult.ErrorDetails))
+            {
+                AnsiConsole.MarkupLine($"[gray]Details: {stopResult.ErrorDetails}[/]");
+            }
+            
+            if (stopResult.SuggestedActions.Any())
+            {
+                AnsiConsole.WriteLine();
+                AnsiConsole.MarkupLine("[yellow]💡 Suggested actions:[/]");
+                foreach (var action in stopResult.SuggestedActions)
+                {
+                    AnsiConsole.MarkupLine($"[gray]• {action}[/]");
+                }
+            }
+            
             return 1;
         }
     }

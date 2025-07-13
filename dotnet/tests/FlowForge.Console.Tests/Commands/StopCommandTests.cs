@@ -16,8 +16,12 @@ public class StopCommandTests
         var mockProcessManager = new Mock<IProcessManager>();
         var mockLogger = new Mock<ILogger<StopCommand>>();
         
-        mockProcessManager.Setup(x => x.IsN8nRunningAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
+        var successResult = ProcessOperationResult.CreateSuccess(
+            ProcessOperationType.Stop,
+            "n8n process is not running");
+        
+        mockProcessManager.Setup(x => x.StopN8nAsyncEnhanced(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(successResult);
         
         var stopCommand = new StopCommand(mockLogger.Object, mockProcessManager.Object);
         var context = new CommandContext(Mock.Of<IRemainingArguments>(), "stop", null);
@@ -27,7 +31,7 @@ public class StopCommandTests
         
         // Assert
         Assert.Equal(0, result);
-        mockProcessManager.Verify(x => x.StopN8nAsync(It.IsAny<CancellationToken>()), Times.Never);
+        mockProcessManager.Verify(x => x.StopN8nAsyncEnhanced(It.IsAny<CancellationToken>()), Times.Once);
     }
     
     [Fact]
@@ -37,11 +41,12 @@ public class StopCommandTests
         var mockProcessManager = new Mock<IProcessManager>();
         var mockLogger = new Mock<ILogger<StopCommand>>();
         
-        mockProcessManager.Setup(x => x.IsN8nRunningAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
+        var successResult = ProcessOperationResult.CreateSuccess(
+            ProcessOperationType.Stop,
+            "n8n process stopped successfully");
         
-        mockProcessManager.Setup(x => x.StopN8nAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
+        mockProcessManager.Setup(x => x.StopN8nAsyncEnhanced(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(successResult);
         
         var stopCommand = new StopCommand(mockLogger.Object, mockProcessManager.Object);
         var context = new CommandContext(Mock.Of<IRemainingArguments>(), "stop", null);
@@ -51,7 +56,7 @@ public class StopCommandTests
         
         // Assert
         Assert.Equal(0, result);
-        mockProcessManager.Verify(x => x.StopN8nAsync(It.IsAny<CancellationToken>()), Times.Once);
+        mockProcessManager.Verify(x => x.StopN8nAsyncEnhanced(It.IsAny<CancellationToken>()), Times.Once);
     }
     
     [Fact]
@@ -61,11 +66,15 @@ public class StopCommandTests
         var mockProcessManager = new Mock<IProcessManager>();
         var mockLogger = new Mock<ILogger<StopCommand>>();
         
-        mockProcessManager.Setup(x => x.IsN8nRunningAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
+        var failureResult = ProcessOperationResult.CreateFailure(
+            ProcessOperationType.Stop,
+            "Failed to stop n8n process",
+            "The process could not be terminated. This may be due to insufficient permissions.",
+            "Try running with elevated permissions (sudo on Linux/macOS)",
+            "Use 'pkill -f n8n' or 'taskkill /F /IM n8n.exe' manually");
         
-        mockProcessManager.Setup(x => x.StopN8nAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
+        mockProcessManager.Setup(x => x.StopN8nAsyncEnhanced(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(failureResult);
         
         var stopCommand = new StopCommand(mockLogger.Object, mockProcessManager.Object);
         var context = new CommandContext(Mock.Of<IRemainingArguments>(), "stop", null);
@@ -75,6 +84,6 @@ public class StopCommandTests
         
         // Assert
         Assert.Equal(1, result);
-        mockProcessManager.Verify(x => x.StopN8nAsync(It.IsAny<CancellationToken>()), Times.Once);
+        mockProcessManager.Verify(x => x.StopN8nAsyncEnhanced(It.IsAny<CancellationToken>()), Times.Once);
     }
 }
