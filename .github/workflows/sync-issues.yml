@@ -1,0 +1,121 @@
+name: Sync GitHub Issues
+
+on:
+  # Trigger on issue events
+  issues:
+    types: [opened, edited, closed, reopened, labeled, unlabeled, assigned, unassigned]
+  
+  # Scheduled sync every 6 hours to catch any missed events
+  schedule:
+    - cron: '0 */6 * * *'
+  
+  # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: 'Force full sync of all issues'
+        required: false
+        default: 'false'
+
+jobs:
+  sync-issues:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      issues: read
+      pull-requests: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup GitHub CLI
+        run: |
+          gh --version
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+      
+      - name: Run issue sync
+        run: |
+          echo "Starting GitHub Issues sync..."
+          chmod +x scripts/sync-github-issues.sh
+          ./scripts/sync-github-issues.sh
+      
+      - name: Update context files
+        run: |
+          echo "Updating session context files from GitHub Issues..."
+          mkdir -p docs/session-context
+          
+          # Generate task queue from current GitHub Issues
+          echo "Creating automated task queue..."
+          
+          # Find issues with 'now' label and create/update task list
+          gh issue list --label "now" --limit 20 --json number,title,labels --jq '
+            "# Next Tasks Queue (Auto-Generated)\n\n## Now (Active Sprint)" as $header |
+            ([""] + [.[] | "1. [ ] \(.title) - [#\(.number)](https://github.com/${{ github.repository }}/issues/\(.number))"]) |
+            [$header] + . + ["\n## Next (Backlog)\n"] |
+            join("\n")
+          ' > docs/session-context/NEXT_TASKS_GENERATED.md
+          
+          # Add 'next' priority issues
+          gh issue list --label "next" --limit 10 --json number,title,labels --jq '.[] | "1. [ ] \(.title) - [#\(.number)](https://github.com/${{ github.repository }}/issues/\(.number))"' >> docs/session-context/NEXT_TASKS_GENERATED.md
+          
+          echo -e "\n## Future (Icebox)" >> docs/session-context/NEXT_TASKS_GENERATED.md
+          
+          # Add 'future' priority issues  
+          gh issue list --label "future" --limit 5 --json number,title,labels --jq '.[] | "1. [ ] \(.title) - [#\(.number)](https://github.com/${{ github.repository }}/issues/\(.number))"' >> docs/session-context/NEXT_TASKS_GENERATED.md
+          
+          echo -e "\n---\n*Auto-generated from GitHub Issues at $(date)*" >> docs/session-context/NEXT_TASKS_GENERATED.md
+          
+          echo "✓ Generated automated task queue"
+      
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          if [ -n "$(git status --porcelain)" ]; then
+            git add docs/session-context/ 2>/dev/null || true
+            
+            # Create commit message based on trigger
+            if [ "${{ github.event_name }}" = "issues" ]; then
+              COMMIT_MSG="Sync issues: Updated issue #${{ github.event.issue.number }} (${{ github.event.action }})"
+            elif [ "${{ github.event_name }}" = "schedule" ]; then
+              COMMIT_MSG="Sync issues: Scheduled sync $(date '+%Y-%m-%d %H:%M')"
+            else
+              COMMIT_MSG="Sync issues: Manual sync triggered"
+            fi
+            
+            git commit -m "$COMMIT_MSG
+
+🤖 Generated with GitHub Actions
+            
+Co-Authored-By: GitHub Actions <noreply@github.com>"
+            
+            git push
+            echo "✓ Synced issues committed and pushed"
+          else
+            echo "ℹ️ No changes to commit"
+          fi
+      
+      - name: Summary
+        run: |
+          echo "## GitHub Issues Sync Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Time**: $(date)" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -d "docs/github-issues/sync" ]; then
+            ISSUE_COUNT=$(ls docs/github-issues/sync/issue-*.json 2>/dev/null | wc -l)
+            echo "- **Issues Synced**: $ISSUE_COUNT" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ github.event_name }}" = "issues" ]; then
+            echo "- **Triggered by**: Issue #${{ github.event.issue.number }} - ${{ github.event.issue.title }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Action**: ${{ github.event.action }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Session context files updated from GitHub Issues." >> $GITHUB_STEP_SUMMARY

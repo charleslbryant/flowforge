@@ -35,6 +35,46 @@ FlowForge is an AI-powered workflow automation CLI tool that integrates Claude C
 11. Update context files for next session
 12. End session (clear context)
 
+### Handling PRDs and CRDs
+
+#### PRD (Product Requirement Document)
+PRDs are high-level feature specifications. When working on a PRD:
+1. **Do NOT implement directly** - PRDs are too broad for a single work session
+2. **Break down into CRDs** - Create specific user stories as CRD issues
+3. **Link CRDs to parent PRD** - Reference the parent PRD in each CRD
+
+#### CRD (Change Request Document)
+CRDs are specific user stories with acceptance criteria. When working on a CRD:
+1. **Review task breakdown** - CRDs include a "Tasks Breakdown" section
+2. **Create GitHub Task Issues** - Each task in the breakdown should become a separate GitHub issue:
+   ```bash
+   gh issue create --title "Task: [specific task description]" \
+     --body "Part of CRD #[CRD-number] - [CRD title]
+   
+   ## Summary
+   [Task description]
+   
+   ## Acceptance Criteria
+   - [ ] [Specific criteria for this task]
+   
+   ## Parent Issues
+   - Resolves part of #[CRD-number]
+   - Depends on #[previous-task-number] (if applicable)
+   
+   ## Implementation Notes
+   [Technical details]" \
+     --label "task,[priority]"
+   ```
+3. **Prioritize tasks**:
+   - First task: Label as "now"
+   - Dependent tasks: Label as "next"
+   - Future tasks: Label as "future"
+4. **Work on ONE task at a time**:
+   - Assign the "now" task to yourself
+   - Complete it before moving to the next
+   - Update priority labels as you progress
+5. **Create ONE feature branch per CRD** - All tasks for a CRD share the same feature branch
+
 ### Context Files
 - `product/product-vision.md` - Long-term product vision and goals
 - `product/product-strategy.md` - Go-to-market and growth strategy
