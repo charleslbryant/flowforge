@@ -28,12 +28,13 @@ FlowForge is an AI-powered workflow automation CLI tool that integrates Claude C
 4. **Create feature branch** for the GitHub issue(s)
 5. Use Test-Driven Development (TDD) approach for .NET development
 6. Update relevant ADRs for architectural decisions
-7. Update documentation as needed
+7. **Create/update documentation** (see Documentation Requirements below)
 8. **Commit changes** to feature branch with George attribution
-9. **Create Pull Request** with comprehensive description
-10. **Close completed GitHub issues** with completion comments
-11. Update context files for next session
-12. End session (clear context)
+9. **Pull latest main and merge** to feature branch before pushing
+10. **Create Pull Request** with comprehensive description
+11. **Close completed GitHub issues** with completion comments
+12. Update context files for next session
+13. End session (clear context)
 
 ### Handling PRDs and CRDs
 
@@ -82,6 +83,57 @@ CRDs are specific user stories with acceptance criteria. When working on a CRD:
 - `CURRENT_STATE.md` - Current project state and development progress
 - `NEXT_TASKS.md` - Prioritized task queue linked to GitHub Issues
 - `ACTIVE_SESSION.md` - Current session progress tracking
+
+## Documentation Requirements
+
+Documentation must be created and maintained alongside feature development to ensure consistency and usability.
+
+### Documentation Types and Requirements
+
+#### User Guides (`/docs/user-guides/`)
+**When Required**: For any user-facing features, commands, or workflows
+**Content Requirements**:
+- Step-by-step instructions with examples
+- Screenshots or CLI output examples where helpful
+- Common troubleshooting scenarios
+- Prerequisites and setup requirements
+
+#### Developer Guides (`/docs/developer-guides/`)
+**When Required**: For APIs, SDKs, CLI tools, or technical integrations
+**Content Requirements**:
+- Code examples and usage patterns
+- API reference documentation
+- SDK/library integration examples
+- Technical architecture explanations
+- Troubleshooting and debugging guides
+
+#### Feature Documentation Updates
+**When Required**: For every new feature or significant change
+**Update Requirements**:
+- Update relevant existing user/developer guides
+- Create new guides if feature introduces new user workflows
+- Update CLI help text and command descriptions
+- Update API documentation if applicable
+
+### Documentation Workflow Integration
+
+#### During Development
+1. **Identify Documentation Needs**: Determine if feature requires new or updated user/developer guides
+2. **Create Documentation Draft**: Write documentation alongside code development
+3. **Include in Testing**: Test documentation accuracy during feature testing
+4. **Review Documentation**: Include documentation review in PR process
+
+#### Documentation Standards
+- Use clear, concise language appropriate for target audience
+- Include practical examples and real-world usage scenarios
+- Maintain consistent formatting and structure across guides
+- Link related documentation and provide clear navigation
+- Keep documentation files in version control alongside code
+
+### Documentation Maintenance
+- Review and update documentation during each feature development cycle
+- Mark outdated documentation for update during retrospectives
+- Maintain documentation as a first-class citizen alongside code
 
 ## Key Architecture
 
