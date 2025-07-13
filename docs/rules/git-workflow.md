@@ -2,6 +2,7 @@
 
 ## CRITICAL: Pull Before Push Rule
 **MANDATORY SEQUENCE - NEVER SKIP:**
+- Make sure all changes are committed before checking out a different branch
 ```bash
 git checkout main
 git pull origin main
