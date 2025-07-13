@@ -35,7 +35,7 @@ public class RestartCommandTests
         
         // Assert
         Assert.Equal(0, result);
-        mockProcessManager.Verify(x => x.StopN8nAsync(It.IsAny<CancellationToken>()), Times.Never);
+        mockProcessManager.Verify(x => x.StopN8nAsyncEnhanced(It.IsAny<CancellationToken>()), Times.Never);
         mockProcessManager.Verify(x => x.StartN8nAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
     
@@ -50,8 +50,8 @@ public class RestartCommandTests
         mockProcessManager.Setup(x => x.IsN8nRunningAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         
-        mockProcessManager.Setup(x => x.StopN8nAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
+        mockProcessManager.Setup(x => x.StopN8nAsyncEnhanced(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ProcessOperationResult.CreateSuccess(ProcessOperationType.Stop, "n8n process stopped successfully"));
         
         mockProcessManager.Setup(x => x.StartN8nAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ProcessStartResult { Success = true });
@@ -67,7 +67,7 @@ public class RestartCommandTests
         
         // Assert
         Assert.Equal(0, result);
-        mockProcessManager.Verify(x => x.StopN8nAsync(It.IsAny<CancellationToken>()), Times.Once);
+        mockProcessManager.Verify(x => x.StopN8nAsyncEnhanced(It.IsAny<CancellationToken>()), Times.Once);
         mockProcessManager.Verify(x => x.StartN8nAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
     
@@ -82,8 +82,8 @@ public class RestartCommandTests
         mockProcessManager.Setup(x => x.IsN8nRunningAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         
-        mockProcessManager.Setup(x => x.StopN8nAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
+        mockProcessManager.Setup(x => x.StopN8nAsyncEnhanced(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ProcessOperationResult.CreateFailure(ProcessOperationType.Stop, "Failed to stop n8n process", "Permission denied", "Try sudo"));
         
         var restartCommand = new RestartCommand(mockLogger.Object, mockProcessManager.Object, mockHealthChecker.Object);
         var context = new CommandContext(Mock.Of<IRemainingArguments>(), "restart", null);
@@ -93,7 +93,7 @@ public class RestartCommandTests
         
         // Assert
         Assert.Equal(1, result);
-        mockProcessManager.Verify(x => x.StopN8nAsync(It.IsAny<CancellationToken>()), Times.Once);
+        mockProcessManager.Verify(x => x.StopN8nAsyncEnhanced(It.IsAny<CancellationToken>()), Times.Once);
         mockProcessManager.Verify(x => x.StartN8nAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
     
@@ -108,8 +108,8 @@ public class RestartCommandTests
         mockProcessManager.Setup(x => x.IsN8nRunningAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         
-        mockProcessManager.Setup(x => x.StopN8nAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
+        mockProcessManager.Setup(x => x.StopN8nAsyncEnhanced(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ProcessOperationResult.CreateSuccess(ProcessOperationType.Stop, "n8n process stopped successfully"));
         
         mockProcessManager.Setup(x => x.StartN8nAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ProcessStartResult { Success = false, ErrorMessage = "Failed to start" });
@@ -122,7 +122,7 @@ public class RestartCommandTests
         
         // Assert
         Assert.Equal(1, result);
-        mockProcessManager.Verify(x => x.StopN8nAsync(It.IsAny<CancellationToken>()), Times.Once);
+        mockProcessManager.Verify(x => x.StopN8nAsyncEnhanced(It.IsAny<CancellationToken>()), Times.Once);
         mockProcessManager.Verify(x => x.StartN8nAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }

@@ -3,6 +3,7 @@ using FlowForge.Console.Services.ProcessManagement;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
 using Spectre.Console.Cli;
+using System.Linq;
 
 namespace FlowForge.Console.Commands;
 
@@ -38,16 +39,31 @@ public class RestartCommand : AsyncCommand
             // n8n is running - stop it first
             AnsiConsole.MarkupLine("[blue]Stopping n8n process...[/]");
             
-            var stopResult = await _processManager.StopN8nAsync(CancellationToken.None);
+            var stopResult = await _processManager.StopN8nAsyncEnhanced(CancellationToken.None);
             
-            if (!stopResult)
+            if (!stopResult.Success)
             {
-                AnsiConsole.MarkupLine("[red]❌ Failed to stop n8n process[/]");
-                AnsiConsole.MarkupLine("[gray]💡 Try manually stopping with: pkill -f n8n[/]");
+                AnsiConsole.MarkupLine($"[red]❌ {stopResult.Message}[/]");
+                
+                if (!string.IsNullOrWhiteSpace(stopResult.ErrorDetails))
+                {
+                    AnsiConsole.MarkupLine($"[gray]Details: {stopResult.ErrorDetails}[/]");
+                }
+                
+                if (stopResult.SuggestedActions.Any())
+                {
+                    AnsiConsole.WriteLine();
+                    AnsiConsole.MarkupLine("[yellow]💡 Suggested actions:[/]");
+                    foreach (var action in stopResult.SuggestedActions)
+                    {
+                        AnsiConsole.MarkupLine($"[gray]• {action}[/]");
+                    }
+                }
+                
                 return 1;
             }
             
-            AnsiConsole.MarkupLine("[green]✅ n8n stopped successfully[/]");
+            AnsiConsole.MarkupLine($"[green]✅ {stopResult.Message}[/]");
         }
         else
         {
