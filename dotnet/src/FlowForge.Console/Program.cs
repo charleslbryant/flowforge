@@ -2,8 +2,11 @@ using FlowForge.Console.Commands;
 using FlowForge.Console.Services.HealthChecking;
 using FlowForge.Console.Services.ProcessManagement;
 using FlowForge.Console.Services.SystemChecking;
+using FlowForge.Console.Services.WorkflowManagement;
 using FlowForge.Console.Infrastructure.Http;
 using FlowForge.Console.Infrastructure.Process;
+using FlowForge.Console.Models.Config;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console.Cli;
 
@@ -16,9 +19,17 @@ internal class Program
         // Create service collection
         var services = new ServiceCollection();
         
+        // Build configuration
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddJsonFile("appsettings.Development.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+        
         // Configure services
         services.AddLogging();
         services.AddHttpClient();
+        services.Configure<N8nConfiguration>(configuration.GetSection("N8n"));
         
         // Register infrastructure services
         services.AddScoped<IN8nHttpClient, N8nHttpClient>();
@@ -28,6 +39,7 @@ internal class Program
         services.AddScoped<IHealthChecker, HealthChecker>();
         services.AddScoped<ISystemChecker, SystemChecker>();
         services.AddScoped<IProcessManager, ProcessManager>();
+        services.AddScoped<IWorkflowService, WorkflowService>();
         
         // Create the command app
         var app = new CommandApp(new TypeRegistrar(services));
@@ -50,6 +62,9 @@ internal class Program
                 
             config.AddCommand<RestartCommand>("restart")
                 .WithDescription("Restart n8n process");
+                
+            config.AddCommand<ListWorkflowsCommand>("list-workflows")
+                .WithDescription("List all n8n workflows");
         });
 
         return await app.RunAsync(args);

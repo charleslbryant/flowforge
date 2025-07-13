@@ -1,10 +1,16 @@
 # Next Tasks Queue
 
 ## Now (Active Sprint)
-1. [ ] Implement Stop command with TDD approach
-2. [ ] Implement Restart command with TDD approach  
-3. [ ] Add workflow list command (n8n API integration)
-4. [ ] Create workflow create command with validation
+**Issue #22: Workflow List Command (forge-dotnet list-workflows)**
+1. [x] Plan and break down PRD #2 into GitHub issues ✅
+2. [x] Create WorkflowService architecture design ✅
+3. [x] Break down Issue #22 into specific tasks ✅
+4. [ ] **CURRENT**: Task #30 - Create WorkflowSummary model
+5. [ ] Task #31 - Create IWorkflowService interface
+6. [ ] Task #32 - Create N8nWorkflowClient infrastructure
+7. [ ] Task #33 - Implement WorkflowService 
+8. [ ] Task #34 - Implement ListWorkflowsCommand
+9. [ ] Task #35 - Write comprehensive unit tests
 
 ## Next (Backlog)
 1. [ ] Add configuration management for n8n API settings
@@ -23,9 +29,12 @@
 6. [ ] Implement workflow versioning and rollback
 
 ## Completed ✅
+- [x] **PRD #1: Stop/Restart Commands for n8n Lifecycle Management** - 2025-07-13
 - [x] Health command implementation - 2025-07-12
 - [x] Doctor command implementation - 2025-07-12  
 - [x] Start command implementation - 2025-07-12
+- [x] Stop command implementation - 2025-07-13
+- [x] Restart command implementation - 2025-07-13
 - [x] Service refactoring with proper namespaces - 2025-07-12
 - [x] Clean architecture implementation - 2025-07-12
 - [x] Comprehensive test suite setup - 2025-07-12
