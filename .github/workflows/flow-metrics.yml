@@ -1,0 +1,246 @@
+name: Flow Metrics Collection
+
+on:
+  issues:
+    types: [opened, edited, closed, reopened, labeled, unlabeled, assigned, unassigned]
+  
+  # Daily aggregation at midnight UTC
+  schedule:
+    - cron: '0 0 * * *'
+    
+  workflow_dispatch:
+
+jobs:
+  collect-flow-metrics:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      issues: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup directories
+        run: |
+          mkdir -p docs/metrics/data
+          mkdir -p docs/metrics/reports
+      
+      - name: Collect flow data for issue
+        if: github.event_name == 'issues'
+        run: |
+          echo "📊 Collecting flow data for issue #${{ github.event.issue.number }}"
+          
+          # Get issue details
+          ISSUE_DATA=$(gh api repos/${{ github.repository }}/issues/${{ github.event.issue.number }} --jq '{
+            number: .number,
+            title: .title,
+            state: .state,
+            created_at: .created_at,
+            closed_at: .closed_at,
+            assignee: .assignee.login // null,
+            labels: [.labels[].name],
+            body: .body
+          }')
+          
+          # Get issue events (state transitions)
+          EVENTS_DATA=$(gh api repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/events --jq '[
+            .[] | select(.event | test("labeled|unlabeled|assigned|unassigned|closed|reopened")) | {
+              event: .event,
+              created_at: .created_at,
+              label: (.label.name // null),
+              assignee: (.assignee.login // null),
+              actor: .actor.login
+            }
+          ]')
+          
+          # Determine issue type
+          ISSUE_TYPE="task"
+          if echo "$ISSUE_DATA" | jq -r '.labels[]' | grep -q "^prd$"; then
+            ISSUE_TYPE="prd"
+          elif echo "$ISSUE_DATA" | jq -r '.labels[]' | grep -q "^crd$"; then
+            ISSUE_TYPE="crd"
+          fi
+          
+          # Calculate flow states and times
+          FLOW_DATA=$(cat << EOF
+          {
+            "issue_number": ${{ github.event.issue.number }},
+            "type": "$ISSUE_TYPE",
+            "title": $(echo "$ISSUE_DATA" | jq -r '.title' | jq -R .),
+            "created_at": $(echo "$ISSUE_DATA" | jq -r '.created_at' | jq -R .),
+            "closed_at": $(echo "$ISSUE_DATA" | jq -r '.closed_at // null'),
+            "current_state": "$(echo "$ISSUE_DATA" | jq -r '.state')",
+            "assignee": $(echo "$ISSUE_DATA" | jq -r '.assignee // null'),
+            "labels": $(echo "$ISSUE_DATA" | jq '.labels'),
+            "events": $EVENTS_DATA,
+            "collected_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          )
+          
+          # Save flow data
+          echo "$FLOW_DATA" | jq . > "docs/metrics/data/issue-${{ github.event.issue.number }}.json"
+          
+          echo "✓ Flow data collected for issue #${{ github.event.issue.number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Calculate daily metrics
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          echo "📈 Calculating daily flow metrics..."
+          
+          # Get today's date
+          TODAY=$(date -u +%Y-%m-%d)
+          WEEK_START=$(date -u -d "monday" +%Y-%m-%d)
+          
+          # Count issues closed today (throughput)
+          THROUGHPUT_TODAY=$(gh api repos/${{ github.repository }}/issues \
+            --method GET \
+            --field state=closed \
+            --field since="${TODAY}T00:00:00Z" \
+            --jq 'length')
+          
+          # Count issues by type closed today
+          TASKS_TODAY=$(gh api repos/${{ github.repository }}/issues \
+            --method GET \
+            --field state=closed \
+            --field labels=task \
+            --field since="${TODAY}T00:00:00Z" \
+            --jq 'length')
+            
+          CRDS_TODAY=$(gh api repos/${{ github.repository }}/issues \
+            --method GET \
+            --field state=closed \
+            --field labels=crd \
+            --field since="${TODAY}T00:00:00Z" \
+            --jq 'length')
+            
+          PRDS_TODAY=$(gh api repos/${{ github.repository }}/issues \
+            --method GET \
+            --field state=closed \
+            --field labels=prd \
+            --field since="${TODAY}T00:00:00Z" \
+            --jq 'length')
+          
+          # Count current work in progress
+          WIP_NOW=$(gh api repos/${{ github.repository }}/issues \
+            --method GET \
+            --field state=open \
+            --field labels=now \
+            --jq 'length')
+            
+          WIP_NEXT=$(gh api repos/${{ github.repository }}/issues \
+            --method GET \
+            --field state=open \
+            --field labels=next \
+            --jq 'length')
+            
+          WIP_FUTURE=$(gh api repos/${{ github.repository }}/issues \
+            --method GET \
+            --field state=open \
+            --field labels=future \
+            --jq 'length')
+          
+          # Create daily metrics
+          DAILY_METRICS=$(cat << EOF
+          {
+            "date": "$TODAY",
+            "week_start": "$WEEK_START",
+            "throughput": {
+              "total": $THROUGHPUT_TODAY,
+              "tasks": $TASKS_TODAY,
+              "crds": $CRDS_TODAY,
+              "prds": $PRDS_TODAY
+            },
+            "work_in_progress": {
+              "now": $WIP_NOW,
+              "next": $WIP_NEXT,  
+              "future": $WIP_FUTURE,
+              "total": $(($WIP_NOW + $WIP_NEXT + $WIP_FUTURE))
+            },
+            "collected_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          )
+          
+          echo "$DAILY_METRICS" | jq . > "docs/metrics/data/daily-${TODAY}.json"
+          
+          echo "✓ Daily metrics calculated for $TODAY"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Generate flow report
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          echo "📋 Generating flow metrics report..."
+          
+          TODAY=$(date -u +%Y-%m-%d)
+          
+          # Read today's metrics
+          if [ -f "docs/metrics/data/daily-${TODAY}.json" ]; then
+            METRICS=$(cat "docs/metrics/data/daily-${TODAY}.json")
+            
+            THROUGHPUT=$(echo "$METRICS" | jq -r '.throughput.total')
+            WIP_TOTAL=$(echo "$METRICS" | jq -r '.work_in_progress.total')
+            WIP_NOW=$(echo "$METRICS" | jq -r '.work_in_progress.now')
+            WIP_NEXT=$(echo "$METRICS" | jq -r '.work_in_progress.next')
+            WIP_FUTURE=$(echo "$METRICS" | jq -r '.work_in_progress.future')
+            
+            # Generate simple dashboard
+            cat > "docs/metrics/reports/dashboard.md" << EOF
+          # Flow Metrics Dashboard
+          
+          *Last updated: $(date -u)*
+          
+          ## Current Flow Status
+          - **Work in Progress**: $WIP_TOTAL issues
+            - Now (Active): $WIP_NOW 
+            - Next (Ready): $WIP_NEXT
+            - Future (Backlog): $WIP_FUTURE
+          
+          ## Today's Throughput
+          - **Issues Completed**: $THROUGHPUT
+          
+          ## Flow Health
+          - **WIP Limit Check**: $(if [ $WIP_NOW -le 5 ]; then echo "✅ Healthy ($WIP_NOW ≤ 5)"; else echo "⚠️ High ($WIP_NOW > 5)"; fi)
+          - **Queue Health**: $(if [ $WIP_NEXT -ge 3 ]; then echo "✅ Ready work available"; else echo "⚠️ Queue needs attention"; fi)
+          
+          ---
+          *Generated automatically from GitHub Issues flow metrics*
+          EOF
+          
+          echo "✓ Flow dashboard generated"
+          fi
+      
+      - name: Commit flow data
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          if [ -n "$(git status --porcelain)" ]; then
+            git add docs/metrics/
+            
+            if [ "${{ github.event_name }}" = "issues" ]; then
+              COMMIT_MSG="Flow metrics: Issue #${{ github.event.issue.number }} (${{ github.event.action }})"
+            else
+              COMMIT_MSG="Flow metrics: Daily aggregation $(date -u +%Y-%m-%d)"
+            fi
+            
+            git commit -m "$COMMIT_MSG
+
+🤖 Generated with GitHub Actions
+
+Co-Authored-By: GitHub Actions <noreply@github.com>"
+            
+            git push
+            echo "✓ Flow metrics data committed"
+          else
+            echo "ℹ️ No changes to commit"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
