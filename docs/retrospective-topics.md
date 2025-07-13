@@ -5,6 +5,7 @@ This file tracks topics for discussion during retrospective meetings.
 ## Current Topics for Discussion
 
 ### Documentation Integration in Development Process
+**GitHub Issue**: [#20](https://github.com/charleslbryant/flowforge/issues/20)
 
 **Context**: Documentation is critical for user adoption and developer experience, but keeping documentation in sync with development has been challenging in the past.
 
@@ -27,6 +28,7 @@ This file tracks topics for discussion during retrospective meetings.
 **Expected Outcome**: Clear process for documentation that ensures user and developer guides stay current with development.
 
 ### Code Review Agent Development
+**GitHub Issue**: [#21](https://github.com/charleslbryant/flowforge/issues/21)
 
 **Context**: Pull request reviews require significant time and expertise to ensure code quality, security, and architectural consistency. A specialized Code Review Agent could provide automated initial review feedback to help human approvers make better-informed decisions.
 
@@ -48,6 +50,27 @@ This file tracks topics for discussion during retrospective meetings.
 - How do we handle false positives and agent feedback quality?
 
 **Expected Outcome**: Automated code review system that enhances human review process and maintains code quality standards.
+
+### Git Branch Management and Task Scope Process Improvement
+
+**Context**: During CRD #9 implementation, there was confusion about branch scope when RestartCommand needed updating alongside StopCommand. The assistant attempted to close GitHub issues while uncommitted changes existed, highlighting gaps in our branch and task management process.
+
+**Proposal**: Implement strict branch management and task scope verification rules:
+
+1. **Mandatory Session Startup Checks**: Always verify current branch matches assigned task
+2. **Task Scope Boundaries**: Clear rules for when changes belong in the same branch vs. requiring separate tasks
+3. **Pre-Commit Verification**: Always check git status before closing any GitHub issues
+4. **Change Scope Protocol**: Stop and check with operator when work expands beyond original task scope
+5. **Session Todo Integration**: Add branch management checks to mandatory session todos
+
+**Questions for Discussion**:
+- How can we better predict when a task will require changes to multiple commands/files?
+- Should CRDs automatically create sub-tasks for each command that needs updating?
+- What's the optimal granularity for feature branches (per-task vs. per-CRD)?
+- How do we handle discovery of related issues during implementation?
+- Should there be automated checks to prevent issue closure with uncommitted changes?
+
+**Expected Outcome**: Clear, enforceable process that prevents branch scope confusion and ensures proper task completion tracking.
 
 ---
 

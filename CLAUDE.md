@@ -37,6 +37,73 @@ FlowForge is an AI-powered workflow automation CLI tool that integrates Claude C
 13. **Instruct operator to /clear context** when all work is complete
 14. End session (clear context)
 
+### Operator Check-in Process
+
+To maintain collaboration and transparency during development, AI assistants must provide check-ins at key transition points:
+
+#### 1. Before Starting Major Work
+**When**: Before beginning a new CRD, major task, or significant development work
+**Format**:
+```
+## Starting Work Check-in
+**About to start**: [Brief description of the work]
+**Estimated scope**: [How much work this represents]
+**Your options**:
+A) Proceed with this approach
+B) Focus on [alternative approach]
+C) Let me break this down further first
+**Recommendation**: [Which option I suggest and why]
+```
+
+#### 2. Before Push/PR Creation
+**When**: After completing development work but before pushing to remote and creating PR
+**Format**:
+```
+## Ready to Push Check-in
+**Completed**: [Summary of what was implemented]
+**Changes**: [Key files/areas modified]
+**Test status**: [All tests passing, coverage maintained, etc.]
+**Your options**:
+A) Proceed with push and PR creation
+B) Make additional changes first: [what changes]
+C) Review the changes before proceeding
+**Recommendation**: [Which option I suggest]
+```
+
+#### 3. After Major Completion
+**When**: After completing a significant piece of work (CRD, major feature, architectural change)
+**Format**:
+```
+## Major Work Completion Check-in
+**Just completed**: [What was accomplished]
+**Impact**: [How this changes the project state]
+**What this enables**: [New capabilities or next logical steps]
+**Your options**:
+A) Continue with [next logical task]
+B) Take a break and review what was done
+C) Switch focus to [different area/priority]
+D) Conduct retrospective on this work
+**Recommendation**: [Which option I suggest and why]
+```
+
+#### 4. End of Session
+**When**: When all planned work is complete and ready to end the session
+**Format**:
+```
+## Session Completion
+**Session summary**: [What was accomplished]
+**Current state**: [Where the project stands now]
+**Recommended next session focus**: [Specific next steps]
+**Operator next steps**: [What you should do - usually /clear context]
+```
+
+#### Check-in Rules
+- **Always wait for operator response** before proceeding after a check-in
+- **Provide clear options** rather than open-ended questions when possible
+- **Include recommendations** but make it clear the operator decides
+- **Keep check-ins brief** but informative
+- **Use consistent formatting** for easy scanning
+
 ### Handling PRDs and CRDs
 
 #### PRD (Product Requirement Document)
@@ -136,6 +203,124 @@ Documentation must be created and maintained alongside feature development to en
 - Mark outdated documentation for update during retrospectives
 - Maintain documentation as a first-class citizen alongside code
 
+## Retrospective Process
+
+### When to Conduct Retrospectives
+
+Retrospectives should be conducted:
+1. **End of major development cycles** - After completing significant features or CRDs
+2. **Monthly cadence** - Regular retrospectives to capture ongoing learnings
+3. **After significant issues** - Process improvements following problems or blockers
+4. **Before major decisions** - Gather team insights before architectural changes
+
+### Retrospective Workflow
+
+#### 1. Preparation Phase
+```bash
+# Review current retrospective topics
+cat docs/retrospective-topics.md
+
+# List current retrospective GitHub issues
+gh issue list --label "retro" --state "open" --json number,title,createdAt
+```
+
+#### 2. Topic Management
+**Adding New Retrospective Topics**:
+```bash
+# Create GitHub issue for new retrospective topic
+gh issue create --title "Retro: [Topic Title]" --body "$(cat <<'EOF'
+**Context**: [Current situation and background]
+
+**Proposal**: [Suggested approach or solution]
+
+**Questions for Discussion**:
+- [Specific question 1]
+- [Specific question 2]
+
+**Expected Outcome**: [What success looks like]
+
+🤖 Generated with AI Assistant (George)
+EOF
+)" --label "retro"
+```
+
+**Updating retrospective-topics.md**:
+- Add new topics to the "Current Topics for Discussion" section
+- Move completed topics to the "Completed Topics" section
+- Include GitHub issue references for traceability
+
+#### 3. Retrospective Session Execution
+1. **Review Topics**: Go through each topic in retrospective-topics.md and related GitHub issues
+2. **Discuss Solutions**: Focus on actionable outcomes and concrete next steps
+3. **Create Action Items**: Convert decisions into GitHub issues with appropriate labels
+4. **Update Documentation**: Record outcomes and update relevant process documentation
+
+#### 4. Post-Retrospective Actions
+```bash
+# Close completed retrospective topics
+gh issue close [issue-number] --comment "✅ Discussed in retrospective: [summary of outcome]"
+
+# Create action items from retrospective outcomes
+gh issue create --title "[Action]: [Description]" --body "[Details from retrospective]" --label "process-improvement"
+
+# Update retrospective-topics.md
+# Move completed topics to "Completed Topics" section
+```
+
+### Retrospective Topic Categories
+
+#### Process Improvements
+- Development workflow enhancements
+- Testing and quality assurance improvements
+- Documentation process refinements
+- Git workflow optimizations
+
+#### Technical Decisions
+- Architecture changes and ADR updates
+- Technology adoption or migration decisions
+- Performance optimization opportunities
+- Security enhancement proposals
+
+#### Team Collaboration
+- Communication improvements
+- Tool adoption and usage
+- Role clarification and responsibilities
+- Cross-team integration topics
+
+### Integration with Session Workflow
+
+Retrospectives are integrated into the session workflow:
+1. **Session Preparation**: Review open retrospective issues during session startup
+2. **Development Work**: Add retrospective topics as they arise during development
+3. **Session Completion**: Update retrospective topics with learnings from the session
+4. **Documentation Updates**: Include retrospective outcomes in session documentation
+
+### Retrospective Commands
+
+#### Review and Management
+```bash
+# Show all retrospective topics and their status
+gh issue list --label "retro" --json number,title,state,createdAt
+
+# View specific retrospective topic details
+gh issue view [retro-issue-number]
+
+# Add retrospective topic discussion to session notes
+echo "## Retrospective Discussion - Issue #[number]" >> docs/session-context/ACTIVE_SESSION.md
+```
+
+#### Topic Lifecycle Management
+```bash
+# Mark retrospective topic as discussed
+gh issue edit [issue-number] --add-label "discussed"
+
+# Convert retrospective outcome to action item
+gh issue create --title "Action: [Action Description]" --body "From retro #[retro-issue]: [details]" --label "process-improvement"
+
+# Archive completed retrospective topic
+gh issue close [issue-number] --comment "Retrospective completed. Action items: #[action-issue-1], #[action-issue-2]"
+```
+
 ## Key Architecture
 
 ### Bash Implementation (`/scripts/`)
@@ -214,6 +399,52 @@ Brief descriptive title of changes
 Co-Authored-By: George <george@decoupledlogic.com>
 EOF
 )"
+```
+
+#### CRITICAL Branch Management and Task Scope Rules
+
+**These rules are MANDATORY and must be added to session todos to ensure compliance:**
+
+1. **One Branch Per Task/CRD Rule**:
+   - Each GitHub task gets its own feature branch: `feature/issue-[number]-[description]`
+   - CRDs get their own branch: `feature/crd-[number]-[description]`
+   - NEVER work on multiple unrelated tasks in the same branch
+   - If work expands beyond original task scope, STOP and check with operator
+
+2. **Task Scope Verification (MANDATORY CHECK)**:
+   - Before making ANY code changes, verify current branch matches the task
+   - If current task requires changes to files beyond the original scope, check:
+     - Is this truly part of the same logical change?
+     - Should this be a separate task/branch?
+     - Should this wait for the current branch to be merged first?
+
+3. **Session Startup Branch Check (MANDATORY)**:
+   - ALWAYS add to session todos: "Check current branch and ensure it matches the work to be done"
+   - If on wrong branch: switch or create correct branch BEFORE any changes
+   - If unsure about branch scope: ask operator before proceeding
+
+4. **Multi-File Change Protocol**:
+   - When changes span multiple commands/files (like RestartCommand + StopCommand):
+     - If they're part of the same logical feature/CRD: same branch OK
+     - If they're separate concerns: create separate tasks and branches
+     - When in doubt: ask operator
+
+5. **Branch Completion Protocol**:
+   - Before closing any GitHub issue, ensure ALL changes are committed
+   - NEVER close issues if there are uncommitted changes
+   - Check `git status` before issue closure
+   - If unexpected changes exist: commit them or ask operator
+
+6. **Emergency Branch Recovery**:
+   - If wrong changes are on wrong branch: stash changes, switch to correct branch, apply stash
+   - If multiple tasks got mixed: create separate commits and cherry-pick to appropriate branches
+
+**Session Todo Template (ALWAYS add these at session start):**
+```
+- [ ] Verify current git branch matches assigned task
+- [ ] Check git status for uncommitted changes  
+- [ ] Confirm task scope before making changes beyond original files
+- [ ] Commit all changes before closing any GitHub issues
 ```
 
 #### Complete Git Ops Development Workflow
