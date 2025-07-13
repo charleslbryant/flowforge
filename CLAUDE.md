@@ -34,7 +34,8 @@ FlowForge is an AI-powered workflow automation CLI tool that integrates Claude C
 10. **Create Pull Request** with comprehensive description
 11. **Close completed GitHub issues** with completion comments
 12. Update context files for next session
-13. End session (clear context)
+13. **Instruct operator to /clear context** when all work is complete
+14. End session (clear context)
 
 ### Handling PRDs and CRDs
 

@@ -26,6 +26,29 @@ This file tracks topics for discussion during retrospective meetings.
 
 **Expected Outcome**: Clear process for documentation that ensures user and developer guides stay current with development.
 
+### Code Review Agent Development
+
+**Context**: Pull request reviews require significant time and expertise to ensure code quality, security, and architectural consistency. A specialized Code Review Agent could provide automated initial review feedback to help human approvers make better-informed decisions.
+
+**Proposal**: Create a Code Review Agent (system prompt) that can:
+
+1. **Automated Code Analysis**: Review PRs for common issues, patterns, and best practices
+2. **Architecture Compliance**: Check adherence to established patterns and ADR decisions  
+3. **Security Review**: Identify potential security vulnerabilities or anti-patterns
+4. **Documentation Verification**: Ensure code changes include appropriate documentation updates
+5. **Test Coverage Analysis**: Verify adequate test coverage for new functionality
+6. **Performance Considerations**: Flag potential performance issues or resource concerns
+
+**Questions for Discussion**:
+- What specific code review criteria should the agent focus on?
+- How should the agent integrate with our GitHub PR process?
+- What level of autonomy should the agent have (comment-only vs. approval blocking)?
+- How do we ensure the agent stays current with our coding standards and practices?
+- Should the agent have different review modes for different types of changes (features vs. fixes)?
+- How do we handle false positives and agent feedback quality?
+
+**Expected Outcome**: Automated code review system that enhances human review process and maintains code quality standards.
+
 ---
 
 ## Completed Topics
