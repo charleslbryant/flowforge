@@ -30,7 +30,10 @@ public class ListWorkflowsCommand : AsyncCommand
         
         if (!result.Success)
         {
-            AnsiConsole.MarkupLine($"[red]❌ Failed to retrieve workflows: {result.ErrorMessage}[/]");
+            var errorMessage = result.ErrorMessage.StartsWith("Failed to retrieve workflows:")
+                ? result.ErrorMessage
+                : $"Failed to retrieve workflows: {result.ErrorMessage}";
+            AnsiConsole.MarkupLine($"[red]❌ {errorMessage}[/]");
             return 1;
         }
 
