@@ -1,18 +1,17 @@
 # Next Tasks Queue
 
 ## Now (Active Sprint)
-1. [ ] **Workflow Create Command** - Create new workflows via n8n API
-2. [ ] **Workflow Delete Command** - Delete workflows via n8n API
-3. [ ] **Workflow Update Command** - Update existing workflows
-4. [ ] **Configuration Management** - Add n8n API settings configuration
+1. [ ] **Issue #23: CRD-2.2 Workflow Get Command** - Retrieve workflow details and JSON (PRIORITY)
+2. [ ] **Issue #24: CRD-2.3 Workflow Create Command** - Create new workflows via n8n API
+3. [ ] **Issue #25: CRD-2.6 Workflow Activation Commands** - Activate/deactivate workflows
 
 ## Next (Backlog)
-1. [ ] Implement comprehensive error handling and logging
-2. [ ] Create workflow execution monitoring commands
-3. [ ] Add credential management commands
-4. [ ] Implement workflow validation against n8n schema
-5. [ ] Add workflow export/import functionality
-6. [ ] Create workflow template management
+1. [ ] **Issue #26: CRD-2.5 Workflow Delete Command** - Delete workflows by ID
+2. [ ] **Issue #27: CRD-2.4 Workflow Update Command** - Update existing workflows
+3. [ ] **Issue #43: PRD OpenTelemetry Integration** - Add telemetry and monitoring
+4. [ ] Create workflow execution monitoring commands
+5. [ ] Add credential management commands
+6. [ ] Implement workflow validation against n8n schema
 
 ## Future (Icebox)
 1. [ ] Add performance optimizations for large workflow operations
@@ -48,23 +47,24 @@
 
 ## Task Details
 
-### Workflow Create Command (Priority: Now)
+### Issue #23: Workflow Get Command (Priority: NOW)
+- **Goal**: Retrieve workflow details and JSON definition by ID
+- **Command**: `forge-dotnet get-workflow <id>`
+- **Approach**: New GetWorkflowCommand, extend WorkflowService with GetWorkflowAsync
+- **Tests**: Valid ID, invalid ID, non-existent workflow, API errors
+- **Estimated time**: 2-3 hours
+
+### Issue #24: Workflow Create Command (Priority: Now)
 - **Goal**: Create new workflows via n8n API
 - **Approach**: New CreateWorkflowCommand with workflow definition input
 - **Tests**: Valid workflow, invalid workflow, API errors
 - **Estimated time**: 2-3 hours
 
-### Workflow Delete Command (Priority: Now)  
-- **Goal**: Delete workflows by ID via n8n API
-- **Approach**: New DeleteWorkflowCommand with confirmation
-- **Tests**: Existing workflow, non-existent workflow, API errors
+### Issue #25: Workflow Activation Commands (Priority: Now)
+- **Goal**: Activate/deactivate workflows via n8n API
+- **Approach**: New ActivateWorkflowCommand and DeactivateWorkflowCommand
+- **Tests**: Valid workflow, invalid workflow, state transitions
 - **Estimated time**: 1-2 hours
-
-### Workflow Update Command (Priority: Now)
-- **Goal**: Update existing workflows via n8n API
-- **Approach**: New UpdateWorkflowCommand with workflow definition
-- **Tests**: Valid updates, invalid updates, non-existent workflow
-- **Estimated time**: 2-3 hours
 
 ## Session Planning Notes
 

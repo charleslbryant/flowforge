@@ -59,7 +59,9 @@
 - **COMPLETED**: PRD #2 planning and CRD breakdown ✅
 - **COMPLETED**: Issue #22 - Workflow List Command (forge-dotnet list-workflows) ✅
 - **COMPLETED**: JSON Output Option - Add --json flag to list-workflows command ✅
-- **STATUS**: Ready for next task selection
+- **COMPLETED**: PRD #43 - OpenTelemetry Integration for FlowForge CLI (created as GitHub issue) ✅
+- **ACTIVE**: Issue #23 - CRD-2.2: Workflow Get Command (now priority)
+- **STATUS**: Ready for development work on get-workflow command
 
 ## Next Major Commands to Implement
 1. **Workflow Create Command** - Create new workflows via n8n API
