@@ -46,4 +46,32 @@ public class WorkflowService : IWorkflowService
             };
         }
     }
+
+    public async Task<WorkflowDetailsResult> GetWorkflowAsync(string id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            _logger.LogDebug("Retrieving workflow {Id} from n8n", id);
+            
+            var workflowDetails = await _n8nHttpClient.GetWorkflowAsync(id, cancellationToken);
+            
+            _logger.LogInformation("Retrieved workflow {Id}", id);
+            
+            return new WorkflowDetailsResult
+            {
+                Success = true,
+                WorkflowDetails = workflowDetails
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retrieve workflow {Id}", id);
+            
+            return new WorkflowDetailsResult
+            {
+                Success = false,
+                ErrorMessage = $"Failed to retrieve workflow: {ex.Message}"
+            };
+        }
+    }
 }

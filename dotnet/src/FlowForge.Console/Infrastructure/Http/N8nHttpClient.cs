@@ -113,6 +113,44 @@ public class N8nHttpClient : IN8nHttpClient
         }
     }
 
+    public async Task<WorkflowDetails> GetWorkflowAsync(string id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var workflowUrl = $"{_config.ApiBaseUrl}/workflows/{id}";
+            var response = await _httpClient.GetAsync(workflowUrl, cancellationToken);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("Failed to retrieve workflow {Id}. Status code: {StatusCode}", id, response.StatusCode);
+                throw new InvalidOperationException($"Workflow {id} not found");
+            }
+
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
+            var workflow = JsonSerializer.Deserialize<N8nWorkflow>(content, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            return MapToWorkflowDetails(workflow ?? new N8nWorkflow());
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP error retrieving workflow {Id}", id);
+            throw;
+        }
+        catch (TaskCanceledException)
+        {
+            _logger.LogWarning("Workflow {Id} retrieval request timed out", id);
+            throw new InvalidOperationException($"Request timed out for workflow {id}");
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to parse workflow {Id} response JSON", id);
+            throw new InvalidOperationException($"Invalid response format for workflow {id}");
+        }
+    }
+
     private static WorkflowSummary MapToWorkflowSummary(N8nWorkflow workflow)
     {
         return new WorkflowSummary
@@ -125,6 +163,32 @@ public class N8nHttpClient : IN8nHttpClient
             Tags = workflow.Tags ?? Array.Empty<string>(),
             NodeCount = workflow.Nodes?.Count() ?? 0,
             Description = workflow.Description
+        };
+    }
+
+    private static WorkflowDetails MapToWorkflowDetails(N8nWorkflow workflow)
+    {
+        return new WorkflowDetails
+        {
+            Id = workflow.Id ?? string.Empty,
+            Name = workflow.Name ?? string.Empty,
+            Active = workflow.Active,
+            CreatedAt = workflow.CreatedAt,
+            UpdatedAt = workflow.UpdatedAt,
+            Tags = workflow.Tags ?? Array.Empty<string>(),
+            NodeCount = workflow.Nodes?.Count() ?? 0,
+            Description = workflow.Description,
+            Nodes = workflow.Nodes?.Select(MapToNodeDefinition) ?? Array.Empty<NodeDefinition>()
+        };
+    }
+
+    private static NodeDefinition MapToNodeDefinition(N8nNode node)
+    {
+        return new NodeDefinition
+        {
+            Id = node.Id ?? string.Empty,
+            Name = node.Name ?? string.Empty,
+            Type = node.Type ?? string.Empty
         };
     }
 }
