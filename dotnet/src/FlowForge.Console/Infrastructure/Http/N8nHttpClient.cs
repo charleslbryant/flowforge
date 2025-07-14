@@ -122,7 +122,7 @@ public class N8nHttpClient : IN8nHttpClient
             
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogWarning("Failed to retrieve workflow {Id}. Status: {StatusCode}", id, response.StatusCode);
+                _logger.LogWarning("Failed to retrieve workflow {Id}. Status code: {StatusCode}", id, response.StatusCode);
                 throw new InvalidOperationException($"Workflow {id} not found");
             }
 
