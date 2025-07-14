@@ -82,7 +82,7 @@ public class GetWorkflowCommand : AsyncCommand<GetWorkflowSettings>
         table.AddRow("Status", workflow.Active ? "[green]Active[/]" : "[dim]Inactive[/]");
         table.AddRow("Node Count", workflow.NodeCount.ToString());
         table.AddRow("Description", workflow.Description ?? "[dim]No description[/]");
-        table.AddRow("Tags", string.Join(", ", workflow.Tags) ?? "[dim]No tags[/]");
+        table.AddRow("Tags", workflow.Tags.Any() ? string.Join(", ", workflow.Tags) : "[dim]No tags[/]");
         table.AddRow("Created", workflow.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"));
         table.AddRow("Updated", workflow.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss"));
 
