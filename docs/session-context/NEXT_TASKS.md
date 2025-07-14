@@ -1,17 +1,16 @@
 # Next Tasks Queue
 
 ## Now (Active Sprint)
-1. [ ] **Issue #23: CRD-2.2 Workflow Get Command** - Retrieve workflow details and JSON (PRIORITY)
-2. [ ] **Issue #24: CRD-2.3 Workflow Create Command** - Create new workflows via n8n API
-3. [ ] **Issue #25: CRD-2.6 Workflow Activation Commands** - Activate/deactivate workflows
+1. [ ] **Issue #24: CRD-2.3 Workflow Create Command** - Create new workflows via n8n API (PRIORITY)
+2. [ ] **Issue #25: CRD-2.6 Workflow Activation Commands** - Activate/deactivate workflows
+3. [ ] **Issue #26: CRD-2.5 Workflow Delete Command** - Delete workflows by ID
 
 ## Next (Backlog)
-1. [ ] **Issue #26: CRD-2.5 Workflow Delete Command** - Delete workflows by ID
-2. [ ] **Issue #27: CRD-2.4 Workflow Update Command** - Update existing workflows
-3. [ ] **Issue #43: PRD OpenTelemetry Integration** - Add telemetry and monitoring
-4. [ ] Create workflow execution monitoring commands
-5. [ ] Add credential management commands
-6. [ ] Implement workflow validation against n8n schema
+1. [ ] **Issue #27: CRD-2.4 Workflow Update Command** - Update existing workflows
+2. [ ] **Issue #43: PRD OpenTelemetry Integration** - Add telemetry and monitoring
+3. [ ] Create workflow execution monitoring commands
+4. [ ] Add credential management commands
+5. [ ] Implement workflow validation against n8n schema
 
 ## Future (Icebox)
 1. [ ] Add performance optimizations for large workflow operations
@@ -24,13 +23,16 @@
 ## Completed ✅
 - [x] **PRD #1: Stop/Restart Commands for n8n Lifecycle Management** - 2025-07-13
 - [x] **PRD #2: Workflow List Command (Issue #22)** - 2025-07-14
+- [x] **Issue #23: CRD-2.2 Workflow Get Command** - 2025-07-14
 - [x] Health command implementation - 2025-07-12
 - [x] Doctor command implementation - 2025-07-12  
 - [x] Start command implementation - 2025-07-12
 - [x] Stop command implementation - 2025-07-13
 - [x] Restart command implementation - 2025-07-13
 - [x] List Workflows command implementation - 2025-07-14
+- [x] Get Workflow command implementation - 2025-07-14
 - [x] JSON Output Option for list-workflows command - 2025-07-14
+- [x] JSON Output Option for get-workflow command - 2025-07-14
 - [x] Service refactoring with proper namespaces - 2025-07-12
 - [x] Clean architecture implementation - 2025-07-12
 - [x] Comprehensive test suite setup - 2025-07-12
@@ -47,13 +49,6 @@
 
 ## Task Details
 
-### Issue #23: Workflow Get Command (Priority: NOW)
-- **Goal**: Retrieve workflow details and JSON definition by ID
-- **Command**: `forge-dotnet get-workflow <id>`
-- **Approach**: New GetWorkflowCommand, extend WorkflowService with GetWorkflowAsync
-- **Tests**: Valid ID, invalid ID, non-existent workflow, API errors
-- **Estimated time**: 2-3 hours
-
 ### Issue #24: Workflow Create Command (Priority: Now)
 - **Goal**: Create new workflows via n8n API
 - **Approach**: New CreateWorkflowCommand with workflow definition input
@@ -64,6 +59,13 @@
 - **Goal**: Activate/deactivate workflows via n8n API
 - **Approach**: New ActivateWorkflowCommand and DeactivateWorkflowCommand
 - **Tests**: Valid workflow, invalid workflow, state transitions
+- **Estimated time**: 1-2 hours
+
+### Issue #26: Workflow Delete Command (Priority: Now)
+- **Goal**: Delete workflows by ID via n8n API
+- **Command**: `forge-dotnet delete-workflow <id>`
+- **Approach**: New DeleteWorkflowCommand, extend WorkflowService with DeleteWorkflowAsync
+- **Tests**: Valid ID, invalid ID, non-existent workflow, API errors, confirmation prompts
 - **Estimated time**: 1-2 hours
 
 ## Session Planning Notes

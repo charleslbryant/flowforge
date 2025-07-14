@@ -1,8 +1,9 @@
 # Current State - FlowForge .NET Port
 
 ## Last Completed Task
-- JSON Output Option for list-workflows command ✅
-- Added --json flag with comprehensive test coverage ✅  
+- GetWorkflowCommand for Issue #23 (CRD-2.2) ✅
+- Implemented full workflow details retrieval with JSON support ✅
+- Added comprehensive test coverage (4 tests) ✅  
 - Created user guide documentation ✅
 - Completed: 2025-07-14
 
@@ -20,6 +21,7 @@
 - `StopCommand` - Stop n8n process ✅
 - `RestartCommand` - Restart n8n process ✅
 - `ListWorkflowsCommand` - List all workflows from n8n API with --json option ✅
+- `GetWorkflowCommand` - Get detailed workflow information and definition with --json option ✅
 
 ### Services (Business Logic)
 - `Services/HealthChecking/` - IHealthChecker + HealthChecker
@@ -33,6 +35,7 @@
 
 ### Models
 - `Models/WorkflowSummary` - Workflow data representation
+- `Models/WorkflowDetails` - Detailed workflow information with node definitions
 
 ### Dependency Injection
 - Microsoft.Extensions.DependencyInjection
@@ -41,7 +44,7 @@
 
 ## Build Status
 - ✅ Build: Clean (0 warnings, 0 errors)
-- ✅ Tests: 36/36 passing
+- ✅ Tests: 40/40 passing (4 new GetWorkflow tests)
 - ✅ Architecture: Services properly separated with own namespaces
 - ✅ Code Quality: Following .NET conventions and patterns
 
@@ -60,8 +63,8 @@
 - **COMPLETED**: Issue #22 - Workflow List Command (forge-dotnet list-workflows) ✅
 - **COMPLETED**: JSON Output Option - Add --json flag to list-workflows command ✅
 - **COMPLETED**: PRD #43 - OpenTelemetry Integration for FlowForge CLI (created as GitHub issue) ✅
-- **ACTIVE**: Issue #23 - CRD-2.2: Workflow Get Command (now priority)
-- **STATUS**: Ready for development work on get-workflow command
+- **COMPLETED**: Issue #23 - CRD-2.2: Workflow Get Command ✅
+- **STATUS**: Ready for next priority task from "Now" queue
 
 ## Next Major Commands to Implement
 1. **Workflow Create Command** - Create new workflows via n8n API
@@ -98,13 +101,13 @@
 ```
 dotnet/
 ├── src/FlowForge.Console/
-│   ├── Commands/ (Health, Doctor, Start, Stop, Restart, ListWorkflows)
-│   ├── Models/ (WorkflowSummary)
+│   ├── Commands/ (Health, Doctor, Start, Stop, Restart, ListWorkflows, GetWorkflow)
+│   ├── Models/ (WorkflowSummary, WorkflowDetails)
 │   ├── Services/ (HealthChecking, ProcessManagement, SystemChecking, WorkflowManagement)
 │   ├── Infrastructure/ (Http, Process)
 │   └── Program.cs (DI container and CLI setup)
 └── tests/FlowForge.Console.Tests/
-    └── Commands/ (Comprehensive test coverage - 35 tests)
+    └── Commands/ (Comprehensive test coverage - 40 tests)
 ```
 
 ## Session Boundary Notes
