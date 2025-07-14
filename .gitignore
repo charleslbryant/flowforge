@@ -140,6 +140,3 @@ mock_temp_*/
 # Bats test artifacts
 *.bats.log
 .bats/
-
-# Claude Code specific
-.claude/
