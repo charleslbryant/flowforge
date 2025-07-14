@@ -43,9 +43,10 @@ public class ListWorkflowsCommandTests
             .ReturnsAsync(result);
 
         var context = new CommandContext(Mock.Of<IRemainingArguments>(), "list-workflows", null);
+        var settings = new ListWorkflowsSettings();
 
         // Act
-        var exitCode = await _command.ExecuteAsync(context);
+        var exitCode = await _command.ExecuteAsync(context, settings);
 
         // Assert
         Assert.Equal(0, exitCode);
@@ -68,9 +69,10 @@ public class ListWorkflowsCommandTests
             .ReturnsAsync(result);
 
         var context = new CommandContext(Mock.Of<IRemainingArguments>(), "list-workflows", null);
+        var settings = new ListWorkflowsSettings();
 
         // Act
-        var exitCode = await _command.ExecuteAsync(context);
+        var exitCode = await _command.ExecuteAsync(context, settings);
 
         // Assert
         Assert.Equal(0, exitCode);
@@ -93,11 +95,44 @@ public class ListWorkflowsCommandTests
             .ReturnsAsync(result);
 
         var context = new CommandContext(Mock.Of<IRemainingArguments>(), "list-workflows", null);
+        var settings = new ListWorkflowsSettings();
 
         // Act
-        var exitCode = await _command.ExecuteAsync(context);
+        var exitCode = await _command.ExecuteAsync(context, settings);
 
         // Assert
         Assert.Equal(1, exitCode);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WithJsonFlag_OutputsJson()
+    {
+        // Arrange
+        var workflows = new[]
+        {
+            new WorkflowSummary { Id = "1", Name = "Test Workflow 1", Active = true, NodeCount = 5, UpdatedAt = new DateTime(2025, 1, 1) },
+            new WorkflowSummary { Id = "2", Name = "Test Workflow 2", Active = false, NodeCount = 3, UpdatedAt = new DateTime(2025, 1, 2) }
+        };
+
+        var result = new WorkflowListResult
+        {
+            Success = true,
+            Workflows = workflows,
+            TotalCount = 2
+        };
+
+        _mockWorkflowService
+            .Setup(x => x.GetWorkflowsAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(result);
+
+        var settings = new ListWorkflowsSettings { Json = true };
+        var context = new CommandContext(Mock.Of<IRemainingArguments>(), "list-workflows", null);
+
+        // Act
+        var exitCode = await _command.ExecuteAsync(context, settings);
+
+        // Assert
+        Assert.Equal(0, exitCode);
+        _mockWorkflowService.Verify(x => x.GetWorkflowsAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }
