@@ -1,9 +1,9 @@
 # Current State - FlowForge .NET Port
 
 ## Last Completed Task
-- Workflow List Command implementation ✅
-- All tests passing with full workflow management infrastructure ✅
-- PR #41 merged to main ✅
+- JSON Output Option for list-workflows command ✅
+- Added --json flag with comprehensive test coverage ✅  
+- Created user guide documentation ✅
 - Completed: 2025-07-14
 
 ## Current Architecture
@@ -19,7 +19,7 @@
 - `StartCommand` - Start n8n process in background ✅
 - `StopCommand` - Stop n8n process ✅
 - `RestartCommand` - Restart n8n process ✅
-- `ListWorkflowsCommand` - List all workflows from n8n API ✅
+- `ListWorkflowsCommand` - List all workflows from n8n API with --json option ✅
 
 ### Services (Business Logic)
 - `Services/HealthChecking/` - IHealthChecker + HealthChecker
@@ -41,7 +41,7 @@
 
 ## Build Status
 - ✅ Build: Clean (0 warnings, 0 errors)
-- ✅ Tests: 35/35 passing
+- ✅ Tests: 36/36 passing
 - ✅ Architecture: Services properly separated with own namespaces
 - ✅ Code Quality: Following .NET conventions and patterns
 
@@ -58,13 +58,13 @@
 - **COMPLETED**: PRD #1 - Stop/Restart Commands for n8n Lifecycle Management ✅
 - **COMPLETED**: PRD #2 planning and CRD breakdown ✅
 - **COMPLETED**: Issue #22 - Workflow List Command (forge-dotnet list-workflows) ✅
+- **COMPLETED**: JSON Output Option - Add --json flag to list-workflows command ✅
 - **STATUS**: Ready for next task selection
 
 ## Next Major Commands to Implement
-1. **JSON Output Option** - Add --json flag to list-workflows command
-2. **Workflow Create Command** - Create new workflows via n8n API
-3. **Workflow Delete Command** - Delete workflows via n8n API
-4. **Workflow Update Command** - Update existing workflows
+1. **Workflow Create Command** - Create new workflows via n8n API
+2. **Workflow Delete Command** - Delete workflows via n8n API
+3. **Workflow Update Command** - Update existing workflows
 
 ## Blockers/Issues
 - None currently - clean build and test state

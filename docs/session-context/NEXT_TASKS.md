@@ -1,11 +1,10 @@
 # Next Tasks Queue
 
 ## Now (Active Sprint)
-1. [ ] **JSON Output Option** - Add --json flag to list-workflows command
-2. [ ] **Workflow Create Command** - Create new workflows via n8n API
-3. [ ] **Workflow Delete Command** - Delete workflows via n8n API
-4. [ ] **Workflow Update Command** - Update existing workflows
-5. [ ] **Configuration Management** - Add n8n API settings configuration
+1. [ ] **Workflow Create Command** - Create new workflows via n8n API
+2. [ ] **Workflow Delete Command** - Delete workflows via n8n API
+3. [ ] **Workflow Update Command** - Update existing workflows
+4. [ ] **Configuration Management** - Add n8n API settings configuration
 
 ## Next (Backlog)
 1. [ ] Implement comprehensive error handling and logging
@@ -32,6 +31,7 @@
 - [x] Stop command implementation - 2025-07-13
 - [x] Restart command implementation - 2025-07-13
 - [x] List Workflows command implementation - 2025-07-14
+- [x] JSON Output Option for list-workflows command - 2025-07-14
 - [x] Service refactoring with proper namespaces - 2025-07-12
 - [x] Clean architecture implementation - 2025-07-12
 - [x] Comprehensive test suite setup - 2025-07-12
@@ -47,12 +47,6 @@
 - [x] Tasks #36-#40 - Additional implementation tasks
 
 ## Task Details
-
-### JSON Output Option (Priority: Now)
-- **Goal**: Add --json flag to list-workflows command for JSON output
-- **Approach**: Update command to support output format option
-- **Tests**: Table output, JSON output, error scenarios
-- **Estimated time**: 1 hour
 
 ### Workflow Create Command (Priority: Now)
 - **Goal**: Create new workflows via n8n API
