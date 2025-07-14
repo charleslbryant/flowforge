@@ -10,5 +10,5 @@ public class WorkflowDetails
     public IEnumerable<string> Tags { get; set; } = Array.Empty<string>();
     public int NodeCount { get; set; }
     public string? Description { get; set; }
-    public object? Nodes { get; set; }
+    public IEnumerable<NodeDefinition> Nodes { get; set; } = Array.Empty<NodeDefinition>();
 }

@@ -178,7 +178,17 @@ public class N8nHttpClient : IN8nHttpClient
             Tags = workflow.Tags ?? Array.Empty<string>(),
             NodeCount = workflow.Nodes?.Count() ?? 0,
             Description = workflow.Description,
-            Nodes = workflow.Nodes
+            Nodes = workflow.Nodes?.Select(MapToNodeDefinition) ?? Array.Empty<NodeDefinition>()
+        };
+    }
+
+    private static NodeDefinition MapToNodeDefinition(N8nNode node)
+    {
+        return new NodeDefinition
+        {
+            Id = node.Id ?? string.Empty,
+            Name = node.Name ?? string.Empty,
+            Type = node.Type ?? string.Empty
         };
     }
 }

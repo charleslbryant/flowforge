@@ -35,7 +35,7 @@ public class GetWorkflowCommandTests
             Tags = new[] { "test" },
             NodeCount = 5,
             Description = "Test workflow",
-            Nodes = new[] { new { id = "node1", name = "Node 1", type = "webhook" } }
+            Nodes = new[] { new NodeDefinition { Id = "node1", Name = "Node 1", Type = "webhook" } }
         };
 
         var result = new WorkflowDetailsResult
@@ -121,7 +121,7 @@ public class GetWorkflowCommandTests
             Tags = new[] { "test" },
             NodeCount = 5,
             Description = "Test workflow",
-            Nodes = new { test = "data" }
+            Nodes = new[] { new NodeDefinition { Id = "node1", Name = "Test Node", Type = "webhook" } }
         };
 
         var result = new WorkflowDetailsResult
