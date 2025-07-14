@@ -1,72 +1,105 @@
-# Task Management Rules
+# Task Management Rules (Concise)
 
-## GitHub Issue Types
+## Overview
 
-### PRD (Product Requirement Document)
-- **Scope**: High-level feature specifications  
-- **Action**: Do NOT implement directly - too broad for single session
-- **Process**: Break down into CRDs (specific user stories)
-- **Linking**: Reference parent PRD in each CRD
+All work is tracked via GitHub issues. Work flows from PRD → CRDs → Tasks. The assistant delivers one CRD at a time, one Task at a time.
 
-### CRD (Change Request Document)  
-- **Scope**: Specific user stories with acceptance criteria
-- **Process**: 
-  1. Review "Tasks Breakdown" section in CRD
-  2. Create separate GitHub task issues for each breakdown item
-  3. Work on ONE task at a time
-  4. Use single feature branch for entire CRD
+When in plan mode process PRDs, then CRDs, then tasks before changing to new mode.
 
-### Task Issues
-- **Creation**: One GitHub issue per CRD task breakdown item
-- **Format**:
-  ```bash
-  gh issue create --title "Task: [specific task description]" \
-    --body "Part of CRD #[CRD-number] - [CRD title]
-  
-  ## Summary
-  [Task description]
-  
-  ## Acceptance Criteria
-  - [ ] [Specific criteria for this task]
-  
-  ## Parent Issues
-  - Resolves part of #[CRD-number]
-  - Depends on #[previous-task-number] (if applicable)"
-  ```
+## Labels
 
-## Task Prioritization
+* **Priority**
 
-### Label System
-- **now**: Current active work (limit 1-2 tasks)
-- **next**: Ready for work after current tasks
-- **future**: Planned but not yet ready
+  * `now`: Current active work
+  * `next`: Ready to start after current
+  * `future`: Planned but not ready
+* **Status**
 
-### Branch Strategy
-- **One branch per CRD**: `feature/crd-[number]-[description]`
-- **All CRD tasks share the same branch**
-- **Complete CRD before merging branch**
+  * `created`, `in progress`, `on hold`, `blocked`, `to do`, `done`, `cancelled`
+* **Scope**
 
-## Work Process
+  * `prd`, `crd`, `task`
+* **Type**
 
-### Task Assignment
-1. Assign "now" priority task to yourself
-2. Move from "next" to "now" when ready for new work
-3. Work on ONE task at a time until completion
+  * `feature`, `bug`, `refactor`, `documentation`, `test`, `review`, `release`, `deploy`
 
-### Task Completion
-1. Complete implementation and tests
-2. Mark GitHub issue as completed with comment
-3. Move to next task in same CRD or switch CRDs
+## PRD: Product Requirement Document
 
-### Scope Management
-- If work expands beyond original task: STOP and check with operator
-- If multiple concerns discovered: create separate tasks/branches
-- When in doubt about scope: ask operator before proceeding
+* **Scope**: High-level feature vision
+* **Action**: Do NOT implement directly
+* **Process**:
 
-## TodoWrite Integration
-Task management todos:
-- [ ] Review task breakdown in assigned CRD
-- [ ] Create GitHub issues for each CRD task if not already created
-- [ ] Assign current "now" priority task to self
-- [ ] Verify current branch matches the task being worked on
-- [ ] Complete current task before starting new work
+  1. Create PRD issue with label `prd`
+  2. Define vision and value with operator
+  3. Work with operator to prioritize PRDs (`now`, `next`, `future`)
+  4. Break down now PRD into CRDs
+  5. Prioritize CRDs (`now`, `next`, `future`)
+  6. Mark PRD `done` when all CRDs complete
+* **Template**: `.github/ISSUE_TEMPLATE/prd-user-story.md`
+
+## CRD: Change Request Document
+
+* **Scope**: Single user story
+* **Action**: Implement in a session
+* **Process**:
+
+  1. Select `now` priority CRD
+  2. Break into tasks (if not already done)
+  3. Work with operator to prioritize tasks (`now`, `next`, `future`)
+  4. Use one branch for entire CRD
+  5. Mark CRD `done` when all tasks are done and move to PRD process
+* **Template**: `.github/ISSUE_TEMPLATE/crd-user-story.md`
+
+## Task
+
+* **Scope**: Specific implementation step
+* **Action**: Deliver as a step in one-piece flow
+* **Process**:
+
+  1. Select `now` task for current CRD
+  2. Implement using TDD
+  3. Commit and push to CRD branch
+  4. Mark task `done`
+* **Template**: `.github/ISSUE_TEMPLATE/task-user-story.md`
+
+## Branch Strategy
+
+* One branch per CRD: `feature/crd-[#]-[desc]`
+* All tasks in CRD use same branch
+* CRD is complete before merge
+
+## Active Work Rules
+
+* One `now` PRD per operator
+* One `now` CRD per session
+* One `now` Task at a time
+
+## Completion Rules
+
+* When Task is `done`, prioritize next task in CRD
+* When all tasks in CRD are `done`, mark CRD `done` and select next CRD (across PRDs)
+* When all CRDs in PRD are `done`, mark PRD `done` and select next PRD
+
+## Priority Decisions
+
+* Product manager decides PRD and CRD priority
+* `now` does not mean “do all children” — prioritize explicitly
+
+## Scope Control
+
+* If scope expands: STOP and ask operator
+* If unrelated concern found: create new issue
+* When unsure: confirm with operator
+
+## Task Planning Checklist
+
+```
+- [ ] Review selected PRD or CRD
+- [ ] Create missing CRDs or tasks as needed
+- [ ] Label all new issues with scope, type, status, priority
+- [ ] Confirm priority with operator
+- [ ] Assign current "now" issue to self
+- [ ] Ensure one-piece flow: only one active task
+- [ ] Verify git branch matches CRD
+- [ ] Begin work using TDD
+```

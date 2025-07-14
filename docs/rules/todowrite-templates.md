@@ -74,13 +74,74 @@
 ]
 ```
 
+## Mode-Specific Templates
+
+### Mode: `/begin` (Session Startup)
+**Auto-generate these todos:**
+```json
+[
+  {"id": "startup-1", "content": "Read Rule 0: Read ALL rule files in /docs/rules/", "status": "pending", "priority": "high"},
+  {"id": "startup-2", "content": "Read Product Context: Read /docs/product/ files", "status": "pending", "priority": "high"},
+  {"id": "startup-3", "content": "Read Architecture: Read /docs/architecture.md", "status": "pending", "priority": "high"},
+  {"id": "startup-4", "content": "Read Current State: Read /docs/session-context/CURRENT_STATE.md", "status": "pending", "priority": "high"},
+  {"id": "startup-5", "content": "Read Task Queue: Read /docs/session-context/NEXT_TASKS.md", "status": "pending", "priority": "high"},
+  {"id": "startup-6", "content": "Select ONE Task: Choose single task from 'now' priority", "status": "pending", "priority": "high"},
+  {"id": "startup-7", "content": "Create Feature Branch: Following git-workflow.md rules", "status": "pending", "priority": "high"},
+  {"id": "startup-8", "content": "Ready for Work Mode: Complete startup, ready to switch to /work", "status": "pending", "priority": "high"}
+]
+```
+
+### Mode: `/plan` (Task Planning)
+**Auto-generate these todos:**
+```json
+[
+  {"id": "plan-1", "content": "Review Current CRD: Understand scope and acceptance criteria", "status": "pending", "priority": "high"},
+  {"id": "plan-2", "content": "Break Down Tasks: Create specific, testable sub-tasks", "status": "pending", "priority": "high"},
+  {"id": "plan-3", "content": "Create GitHub Issues: One issue per task with proper labels", "status": "pending", "priority": "high"},
+  {"id": "plan-4", "content": "Set Priorities: Assign 'now', 'next', 'future' labels appropriately", "status": "pending", "priority": "medium"},
+  {"id": "plan-5", "content": "Validate Scope: Ensure tasks align with CRD goals", "status": "pending", "priority": "medium"},
+  {"id": "plan-6", "content": "Select Next Task: Choose single task for immediate work", "status": "pending", "priority": "high"},
+  {"id": "plan-7", "content": "Check-in: Confirm plan before implementation", "status": "pending", "priority": "high"}
+]
+```
+
+### Mode: `/dev` (Core Development)
+**Auto-generate these todos:**
+```json
+[
+  {"id": "dev-1", "content": "Write Failing Test: Create test for current requirement", "status": "pending", "priority": "high"},
+  {"id": "dev-2", "content": "Run Test: Verify test fails (red phase)", "status": "pending", "priority": "high"},
+  {"id": "dev-3", "content": "Implement Minimum: Write minimum code to pass test", "status": "pending", "priority": "high"},
+  {"id": "dev-4", "content": "Run Test: Verify test passes (green phase)", "status": "pending", "priority": "high"},
+  {"id": "dev-5", "content": "Refactor: Clean up code while keeping tests green", "status": "pending", "priority": "medium"},
+  {"id": "work-6", "content": "Commit: Commit changes with proper message format", "status": "pending", "priority": "high"},
+  {"id": "work-7", "content": "Check-in: Provide check-in before next task", "status": "pending", "priority": "high"}
+]
+```
+
+### Mode: `/deliver` (Delivery)
+**Auto-generate these todos:**
+```json
+[
+  {"id": "deliver-1", "content": "Final Testing: Ensure all tests pass", "status": "pending", "priority": "high"},
+  {"id": "deliver-2", "content": "Git Workflow: Pull main, merge, commit with George attribution", "status": "pending", "priority": "high"},
+  {"id": "deliver-3", "content": "Push Branch: Push to remote following git rules", "status": "pending", "priority": "high"},
+  {"id": "deliver-4", "content": "Create PR: Use proper PR template with test plan", "status": "pending", "priority": "high"},
+  {"id": "deliver-5", "content": "Update Issues: Close completed GitHub issues", "status": "pending", "priority": "medium"},
+  {"id": "deliver-6", "content": "Update Documentation: Add user/developer guides if needed", "status": "pending", "priority": "medium"},
+  {"id": "deliver-7", "content": "Session Completion: Update context files for next session", "status": "pending", "priority": "medium"},
+  {"id": "deliver-8", "content": "Clear Context: Instruct operator to /clear context", "status": "pending", "priority": "high"}
+]
+```
+
 ## Usage Instructions
 
 ### For AI Assistant (George):
-1. **Reference this file** at key workflow transition points
-2. **Auto-generate relevant template todos** based on current activity
+1. **Use Mode Commands**: Load appropriate mode with `/begin`, `/plan`, `/dev`, `/deliver`
+2. **Auto-generate mode templates** when entering each mode
 3. **Mark todos complete** as each step is accomplished
 4. **Never skip compliance todos** - they ensure process adherence
+5. **Transition modes** only after completing current mode checklist
 
 ### Template Activation Triggers:
 - **Session Start**: Always use Session Startup Template

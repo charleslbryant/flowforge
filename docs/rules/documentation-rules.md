@@ -15,9 +15,10 @@
 ### Feature Updates
 - **Requirement**: Every new feature or significant change
 - **Actions**: 
-  - Update existing relevant guides
+  - Update existing relevant guides and readme files
   - Create new guides for new user workflows
   - Update CLI help text and command descriptions
+  - Write ADRs to journal development and decisions `/docs/adr`
 
 ## Documentation Standards
 
