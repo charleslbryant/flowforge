@@ -234,6 +234,5 @@ The get-workflow command:
 - Supports both human-readable table and machine-readable JSON output
 - Implements proper timeout handling (30 seconds)
 - Provides detailed error messages for troubleshooting
-- Validates workflow ID format before making API requests
 
 For technical implementation details, see the [Developer Guide](../developer-guides/workflow-management.md).
