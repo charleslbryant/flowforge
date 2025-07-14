@@ -1,3 +1,5 @@
+using FlowForge.Console.Models.Workflows;
+
 namespace FlowForge.Console.Infrastructure.Http;
 
 /// <summary>
@@ -7,4 +9,5 @@ public interface IN8nHttpClient
 {
     Task<bool> CheckHealthAsync(CancellationToken cancellationToken);
     Task<string> GetHealthDetailsAsync(CancellationToken cancellationToken);
+    Task<IEnumerable<WorkflowSummary>> GetWorkflowsAsync(CancellationToken cancellationToken);
 }

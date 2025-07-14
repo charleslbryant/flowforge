@@ -48,10 +48,12 @@
 - ADR-0007: Services infrastructure separation ✅
 
 ## Active Work
-- Current task: CRD #9 - Enhanced Process Operation Feedback
-- Focus: Implementing ProcessOperationResult for detailed user feedback
+- **COMPLETED**: PRD #1 - Stop/Restart Commands for n8n Lifecycle Management ✅
+- **COMPLETED**: PRD #2 planning and CRD breakdown ✅
+- **CURRENT**: Issue #22 - Workflow List Command (forge-dotnet list-workflows)
+- **CURRENT TASK**: Task #30 - Create WorkflowSummary model for workflow list data
+- **BRANCH**: feature/workflow-list-command
 - Started: 2025-07-13
-- Progress: Completed Tasks #15 and #16, Task #17 ready for next session
 
 ## Next Major Commands to Implement
 1. **Stop Command** - Stop n8n process
