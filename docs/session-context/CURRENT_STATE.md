@@ -1,10 +1,10 @@
 # Current State - FlowForge .NET Port
 
 ## Last Completed Task
-- Service refactoring with individual namespaces ✅
-- All tests passing with clean architecture ✅
-- Services organized in proper directories and namespaces ✅
-- Completed: 2025-07-12
+- Workflow List Command implementation ✅
+- All tests passing with full workflow management infrastructure ✅
+- PR #41 merged to main ✅
+- Completed: 2025-07-14
 
 ## Current Architecture
 
@@ -17,15 +17,22 @@
 - `HealthCommand` - Check n8n API status ✅
 - `DoctorCommand` - Full system health check ✅  
 - `StartCommand` - Start n8n process in background ✅
+- `StopCommand` - Stop n8n process ✅
+- `RestartCommand` - Restart n8n process ✅
+- `ListWorkflowsCommand` - List all workflows from n8n API ✅
 
 ### Services (Business Logic)
 - `Services/HealthChecking/` - IHealthChecker + HealthChecker
 - `Services/ProcessManagement/` - IProcessManager + ProcessManager
 - `Services/SystemChecking/` - ISystemChecker + SystemChecker
+- `Services/WorkflowManagement/` - IWorkflowService + WorkflowService
 
 ### Infrastructure (External Dependencies)
-- `Infrastructure/Http/` - N8nHttpClient for API communication
+- `Infrastructure/Http/` - N8nHttpClient for API communication (extended with workflow APIs)
 - `Infrastructure/Process/` - ProcessExecutor for system process management
+
+### Models
+- `Models/WorkflowSummary` - Workflow data representation
 
 ### Dependency Injection
 - Microsoft.Extensions.DependencyInjection
@@ -34,7 +41,7 @@
 
 ## Build Status
 - ✅ Build: Clean (0 warnings, 0 errors)
-- ✅ Tests: 9/9 passing
+- ✅ Tests: 35/35 passing
 - ✅ Architecture: Services properly separated with own namespaces
 - ✅ Code Quality: Following .NET conventions and patterns
 
@@ -50,15 +57,14 @@
 ## Active Work
 - **COMPLETED**: PRD #1 - Stop/Restart Commands for n8n Lifecycle Management ✅
 - **COMPLETED**: PRD #2 planning and CRD breakdown ✅
-- **CURRENT**: Issue #22 - Workflow List Command (forge-dotnet list-workflows)
-- **CURRENT TASK**: Task #30 - Create WorkflowSummary model for workflow list data
-- **BRANCH**: feature/workflow-list-command
-- Started: 2025-07-13
+- **COMPLETED**: Issue #22 - Workflow List Command (forge-dotnet list-workflows) ✅
+- **STATUS**: Ready for next task selection
 
 ## Next Major Commands to Implement
-1. **Stop Command** - Stop n8n process
-2. **Restart Command** - Restart n8n process  
-3. **Workflow Commands** - Create, list, delete workflows via n8n API
+1. **JSON Output Option** - Add --json flag to list-workflows command
+2. **Workflow Create Command** - Create new workflows via n8n API
+3. **Workflow Delete Command** - Delete workflows via n8n API
+4. **Workflow Update Command** - Update existing workflows
 
 ## Blockers/Issues
 - None currently - clean build and test state
@@ -82,27 +88,30 @@
 - Project is in excellent state for continued development
 - TDD approach established and working well
 - Clean architecture provides good foundation for additional commands
-- Ready to implement Stop/Restart commands or workflow management features
+- Workflow management infrastructure now in place
+- Ready to implement additional workflow commands or JSON output option
 - Bash implementation available as feature reference in `/scripts/`
 
 ## File Structure Status
 ```
 dotnet/
 ├── src/FlowForge.Console/
-│   ├── Commands/ (HealthCommand, DoctorCommand, StartCommand)
-│   ├── Services/ (HealthChecking, ProcessManagement, SystemChecking)
+│   ├── Commands/ (Health, Doctor, Start, Stop, Restart, ListWorkflows)
+│   ├── Models/ (WorkflowSummary)
+│   ├── Services/ (HealthChecking, ProcessManagement, SystemChecking, WorkflowManagement)
 │   ├── Infrastructure/ (Http, Process)
 │   └── Program.cs (DI container and CLI setup)
 └── tests/FlowForge.Console.Tests/
-    └── Commands/ (Comprehensive test coverage)
+    └── Commands/ (Comprehensive test coverage - 35 tests)
 ```
 
 ## Session Boundary Notes
 - All changes committed with clean git state
+- Workflow list command merged to main
 - Documentation up to date
 - Tests passing consistently
 - Ready for next development session with minimal context needed
 
 ---
-*Last updated: 2025-07-12*  
+*Last updated: 2025-07-14*  
 *Next session should read this file and NEXT_TASKS.md to understand current state*
