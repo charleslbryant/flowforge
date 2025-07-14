@@ -68,9 +68,12 @@
 [
   {"id": "completion-1", "content": "Commit all changes following git-workflow.md", "status": "pending", "priority": "high"},
   {"id": "completion-2", "content": "Create Pull Request with comprehensive description", "status": "pending", "priority": "high"},
-  {"id": "completion-3", "content": "Close completed GitHub issues with completion comments", "status": "pending", "priority": "medium"},
-  {"id": "completion-4", "content": "Update context files for next session", "status": "pending", "priority": "medium"},
-  {"id": "completion-5", "content": "Instruct operator to /clear context", "status": "pending", "priority": "high"}
+  {"id": "completion-3", "content": "Wait for PR approval and merge", "status": "pending", "priority": "high"},
+  {"id": "completion-4", "content": "CRITICAL: Switch to main, pull, delete feature branch", "status": "pending", "priority": "high"},
+  {"id": "completion-5", "content": "Update session context files on main branch", "status": "pending", "priority": "high"},
+  {"id": "completion-6", "content": "Commit and push context updates to main", "status": "pending", "priority": "high"},
+  {"id": "completion-7", "content": "Close completed GitHub issues with completion comments", "status": "pending", "priority": "medium"},
+  {"id": "completion-8", "content": "Instruct operator to /clear context", "status": "pending", "priority": "high"}
 ]
 ```
 

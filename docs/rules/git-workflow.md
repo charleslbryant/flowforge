@@ -59,7 +59,16 @@ EOF
    ```
 7. **Push**: `git push -u origin feature/issue-[number]-[description]`
 8. **Pull Request**: Create PR with template
-9. **Merge & Cleanup**: Merge PR and clean up branches
+9. **Merge PR**: Merge or approve PR 
+10. **Post-Merge Cleanup** (CRITICAL):
+    ```bash
+    # MANDATORY sequence after PR merge
+    git checkout main
+    git pull origin main
+    git branch -d feature/issue-[number]-[description]
+    # Update session context files on main
+    # Commit context updates and push
+    ```
 
 ## Troubleshooting
 
