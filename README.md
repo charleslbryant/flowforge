@@ -1,6 +1,6 @@
 # FlowForge
 
-![Validate workflow.json](https://github.com/charleslbryant/flowforge/actions/workflows/validate-workflow.yml/badge.svg)
+*This repo is still very much experimental and messy. Use at your own risk.*
 
 **🔥 Get your flow up!**
 
